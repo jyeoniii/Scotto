@@ -48,19 +48,19 @@ contract Main {
 
 contract RewardingContract {
 
-    Game game;
-    address owner;
+
+    address private owner;
 
     modifier ownerFunc {
       require(owner == msg.sender);
       _;
     }
 
-    function RewardingContract() {
+    function RewardingContract() public {
         owner = msg.sender;
     }
 
-    function reward(Game game) ownerFunc {
+    function reward(Game game) ownerFunc public {
         rewardCreators(game);
         rewardParticipants(game);
         rewardVerifier(game);
