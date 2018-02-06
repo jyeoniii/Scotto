@@ -6,13 +6,13 @@ contract Main {
 
     uint private id = 0;
     Game[] private games;
-    TokenContract tokenManager;
+
     RewardingContract reward;
 
     mapping (string => address[]) private creators; // string: identifier of the game
 
     function Main() {
-        tokenManager = new TokenContract();
+
         reward = new RewardingContract();
     }
 
