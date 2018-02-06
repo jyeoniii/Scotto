@@ -34,7 +34,7 @@ contract Main {
         creators[gameInfoStr].push(creator);
 
         if (creators.length >= 20  ) {
-            Game game = new Game(id++, creators[gameInfoStr]);
+            Game game = new Game(id++, creators[gameInfoStr], timestamp);
             games.push(game);
         }
     }
