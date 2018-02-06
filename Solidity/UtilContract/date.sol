@@ -14,16 +14,15 @@ uint[] result;
     function Util() {
 
     }
+
+    //년 월 일 시 분 -> timestamp
   function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute)
    constant returns (uint){
 
      return dateTime.toTimestamp(year, month, day, hour, minute);
    }
 
-
-   function toNow() returns (uint){
-       return now;
-   }
+   // timestamp -> 날짜
   function toDate()
    {
 
