@@ -5,6 +5,10 @@ contract Game {
 
     */
 
+    struct creator {
+      address addCreator;
+      uint tokenAmount;
+    }
 
     enum status { BETTING, PENDING, RESULT, BEFORE_REWARD, FINISH }
     struct bettingInfo{
@@ -25,18 +29,16 @@ contract Game {
     // date
     uint start; // 시작 시간 timestamp
 
-    address[] creators; // 경기 등록한 사람들 목록
+    creator[] creators; // 경기 등록한 사람들 목록
     //--------------------
     // participants
     mapping (string => bettingInfo[]) betting;
     mapping (string => result) results;
 
-    function Game(uint id, /*.., */ address[] _creators) public {
-        /*
-        ..
-        */
-        stat = status.BETTING;
-        creators = _creators;
+    function Game(uint id, creator[] creators, uint start) public {
+        this.id = id;
+        this.creators = creators;
+        this.start = timestamp;
     }
 
     function addBettingInfo(address addr, uint numEther, uint numToken, uint scoreA, uint scoreB){

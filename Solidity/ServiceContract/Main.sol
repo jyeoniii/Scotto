@@ -4,26 +4,37 @@ import "browser/Game.sol";
 
 contract Main {
 
+    struct creator {
+      address addCreator;
+      uint tokenAmount;
+    }
+
+
     uint private id = 0;
     Game[] private games;
 
     RewardingContract reward;
 
-    mapping (string => address[]) private creators; // string: identifier of the game
+
+    mapping (string => creator[]) private creators; // string: identifier of the game
 
     function Main() {
-
         reward = new RewardingContract();
     }
 
-    function createGame(/*game info*/) {
-        require(/*check timestamp*/);
-        // findIdStr();
-        string gameInfoStr = "201802/....";
-        creators[gameInfoStr].push(msg.sender);
+    function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) {
+        require(isCreating(timestamp) == true);
+        require(tokenAmount >= getCirculation());
+        require(creators[gameInfoStr] < 20);
 
-        if (true) {
-            Game game = new Game(id++ /*, game info*/);
+        creator creator;
+        creator.address = msg.sender;
+        creator.tokenAmount = tokenAmount;
+
+        creators[gameInfoStr].push(creator);
+
+        if (creators.length >= 20  ) {
+            Game game = new Game(id++, creators[gameInfoStr]);
             games.push(game);
         }
     }
@@ -43,6 +54,10 @@ contract Main {
     function checkResult(uint id) { // when user triggers event after the result has been decided
         games[id].finalize();
         reward.reward(games[id]);
+    }
+
+    function isCreating(uint start) public returns (bool){
+      return ( now >= start - 7 days && now <start - 3 days ) // 임시
     }
 }
 
