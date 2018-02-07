@@ -1,10 +1,11 @@
 pragma solidity ^0.4.19;
 
 contract Common {
-    
-    function maxResult(uint a, uint b, uint c) returns (uint8[3]){
-        uint8[3] memory winner;
 
+
+    function maxResult(uint8 a, uint8 b, uint8 c) returns (uint8[3]){
+
+        uint8[3] memory winner;
         if(a > b){
             if(b >= c)
             winner[0] = 1; // a > b >= c
@@ -36,7 +37,10 @@ contract Common {
 
         else if(a == b){
             if(a < c) winner[2] = 1;
-            else if( a > c) winner[2] = 1;
+            else if( a > c) {
+                winner[0] = 1;
+                winner[1] = 1;
+            }
             else{
                 winner[0] = 1;
                 winner[1] = 1;
@@ -44,5 +48,8 @@ contract Common {
             }
         }
 
+
     }
+
+
 }
