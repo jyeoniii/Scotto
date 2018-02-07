@@ -5,9 +5,14 @@ import "browser/Game.sol";
 contract Main {
 
     struct creator {
-      address addCreator;
+      address addr;
       uint tokenAmount;
     }
+
+
+    uint private constant MIN_CREATORS = 20;
+    uint private constant CREATE_START = 7 days;
+    uint private constant CREATE_PERIOD = 4 days;
 
 
     uint private id = 0;
@@ -25,15 +30,15 @@ contract Main {
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) {
         require(isCreating(timestamp) == true);
         require(tokenAmount >= getCirculation());
-        require(creators[gameInfoStr] < 20);
+        require(creators[gameInfoStr] < MIN_CREATORS);
 
-        creator creator;
-        creator.address = msg.sender;
-        creator.tokenAmount = tokenAmount;
+        creator _creator;
+        _creator.addr = msg.sender;
+        _creator.tokenAmount = tokenAmount;
 
-        creators[gameInfoStr].push(creator);
+        _creators[gameInfoStr].push(creator);
 
-        if (creators.length >= 20  ) {
+        if (creators.length >= MIN_CREATORS ) {
             Game game = new Game(id++, creators[gameInfoStr], timestamp);
             games.push(game);
         }
@@ -57,12 +62,11 @@ contract Main {
     }
 
     function isCreating(uint start) public returns (bool){
-      return ( now >= start - 7 days && now <start - 3 days ) // 임시
+      return ( now >= start - CREATE_START && now <start - CREATE_PERIOD ); // 임시
     }
 }
 
 contract RewardingContract {
-
 
     address private owner;
 
