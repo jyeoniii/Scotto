@@ -96,10 +96,8 @@ contract Game is Common{
     Determine the results
     Reward participants
      */
-    function finalize() public {
-      uint8[3] memory winner = maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
-
-
+    function finalize() {
+      bool[3] memory winner = maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
     }
 
     // Rewarding functions
