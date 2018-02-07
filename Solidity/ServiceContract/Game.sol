@@ -51,8 +51,10 @@ contract Game{
 
     uint creatorTokens = 0;
     uint tokenPool = 0;
-    uint etherPool = 0;
-
+    uint totalEtherPool = 0;
+    uint etherForCompensation = 0;
+    uint etherForWinner = 0;
+    uint[3] resultEtherPool;
 
     function Game(uint _id, Creator[] _creators, uint _creatorTokens, uint timestamp) public {
         id = _id;
@@ -73,9 +75,10 @@ contract Game{
 
         bettingInfo memory info = bettingInfo(addr, numEther, numToken);
         betting[result].push(info);
+        resultEtherPool[result] += numEther;
 
         tokenPool += numToken;
-        etherPool += numEther;
+        totalEtherPool += numEther;
     }
 
     function enterResult(uint8 res, uint numToken, address addr) public {
@@ -98,6 +101,22 @@ contract Game{
      */
     function finalize() {
       finalResult = Common.maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
+
+      if(finalResult[0])
+          etherForWinner += resultEtherPool[0];
+
+      if(finalResult[1])
+          etherForWinner += resultEtherPool[1];
+
+      if(finalResult[2])
+          etherForWinner += resultEtherPool[2];
+
+      etherForCompensation = totalEtherPool - etherForWinner;
+
+    //   reward();
+    //   myAddress.transfer(etherForCompensation * 8 / 10 /10 );
+
+
     }
 
     // Rewarding functions
@@ -107,7 +126,10 @@ contract Game{
         2. Tokens: Same amount with collateralized tokens
     */
     function rewardCreators() private {
-        uint etherForCreators = etherPool * ETHER_FEE_CREATOR / 10;
+
+
+
+        uint etherForCreators = etherForCompensation * ETHER_FEE_CREATOR / 10 / 10;
         address addr;
         uint tokenAmount;
 
