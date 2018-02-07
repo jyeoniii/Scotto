@@ -1,5 +1,7 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.19;
 import "browser/Common.sol";
+import "browser/Creator.sol";
+
 
 contract Game is Common{
 
@@ -26,13 +28,13 @@ contract Game is Common{
     // date
     uint start; // 시작 시간 timestamp
 
-    creator[] creators; // 경기 등록한 사람들 목록
+    Creator[] creators; // 경기 등록한 사람들 목록
     //--------------------
     // participants
     mapping(uint8 => bettingInfo[]) betting; //length should be 3
-    gameResult[3] results;       //length should be 3
+    gameResult[] results;       //length should be 3
 
-    function Game(uint _id, creator[] _creators, uint timestamp) public {
+    function Game(uint _id, Creator[] _creators, uint timestamp) public {
         id = _id;
         creators = _creators;
         start = timestamp;
@@ -51,7 +53,10 @@ contract Game is Common{
     }
 
     function enterResult(uint8 res, uint numToken, address addr) {
-        results[res].verifiers.push(verifierInfo(addr, numToken));
+        verifierInfo x;
+        x.addr = addr;
+        x.numToken = numToken;
+        results[res].verifiers.push(x);
         results[res].totalToken += numToken;
     }
 
@@ -65,6 +70,7 @@ contract Game is Common{
     Reward participants
      */
     function finalize() {
+      uint8[3] memory winner = maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
 
 
     }
