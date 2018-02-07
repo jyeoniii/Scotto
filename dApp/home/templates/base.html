@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>dApp</title>
+  <!-- Import BootStrap -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+  <!--Import JQuery-->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  {% block head_content %}
+  {% endblock head_content %}
+</head>
+<body>
+  <header>
+
+  </header>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {% block content %}
+        {% endblock content %}
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
