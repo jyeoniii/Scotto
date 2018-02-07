@@ -3,7 +3,7 @@ pragma solidity ^0.4.19;
 import "browser/Game.sol";
 import "browser/Common.sol";
 import "browser/Creator.sol";
-contract Main is Common{
+contract Main {
 
     struct tempGame {
         Creator[] creators;

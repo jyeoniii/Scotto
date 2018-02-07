@@ -3,7 +3,7 @@ import "browser/Common.sol";
 import "browser/Creator.sol";
 
 
-contract Game is Common{
+contract Game{
 
     struct bettingInfo{
         address addr;
@@ -42,7 +42,7 @@ contract Game is Common{
     // game Info
     uint id ; // 게임 고유 id
     uint start; // 시작 시간 timestamp
-
+    bool[3] finalResult; // 최종 게임 결과
 
     Creator[] creators; // 경기 등록한 사람들 목록
     mapping(uint8 => bettingInfo[]) betting; //length should be 3
@@ -97,7 +97,7 @@ contract Game is Common{
     Reward participants
      */
     function finalize() {
-      bool[3] memory winner = maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
+      finalResult = Common.maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
     }
 
     // Rewarding functions

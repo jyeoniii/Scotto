@@ -1,6 +1,6 @@
 pragma solidity ^0.4.19;
 
-contract Common {
+library Common {
 
 
     function maxResult(uint a, uint b, uint c) returns (bool[3]){
