@@ -1,26 +1,23 @@
-contract Game {
+pragma solidity ^0.4.0;
+import "browser/Common.sol";
 
-    struct creator {
-      address addr;
-      uint tokenAmount;
-    }
+contract Game is Common{
 
     struct bettingInfo{
-        address person;
+        address addr;
         uint numEther;
         uint numToken;
     }
 
-    struct result {
-        uint count;
-        address[] addrs;
+    struct verifierInfo {
+        address addr;
+        uint numToken;
     }
 
-    //constant
-    uint private constant BETTING_TIME = 3 days;
-    uint private constant PLAYING_TIME = 3 hours;
-    uint private constant RESULT_TIME = 18 hours;
-
+    struct gameResult {
+        verifierInfo[] verifiers;
+        uint totalToken;
+    }
 
     // A vs B
     uint id ; // 게임 고유 id
@@ -32,8 +29,8 @@ contract Game {
     creator[] creators; // 경기 등록한 사람들 목록
     //--------------------
     // participants
-    mapping (string => bettingInfo[]) betting;
-    mapping (string => result) results;
+    mapping(uint8 => bettingInfo[]) betting; //length should be 3
+    gameResult[3] results;       //length should be 3
 
     function Game(uint _id, creator[] _creators, uint timestamp) public {
         id = _id;
@@ -41,32 +38,49 @@ contract Game {
         start = timestamp;
     }
 
-    function addBettingInfo(address addr, uint numEther, uint numToken, uint scoreA, uint scoreB){
-       string memory scoreStr = getScoreStr(scoreA, scoreB);
-       betting[scoreStr].push(bettingInfo(addr, numEther, numToken));
+    /*
+    result: 0 (bet to A)
+            1 (bet to Draw)
+            2 (bet to B)
+    */
+    function addBettingInfo(address addr, uint numEther, uint numToken, uint8 result){
+        require(result>=0 && result<=2);
+
+        bettingInfo memory info = bettingInfo(addr, numEther, numToken);
+        betting[result].push(info);
     }
 
-    function enterResult(uint scoreA, uint scoreB, address addr) {
-        require();
-        string memory scoreStr = getScoreStr(scoreA, scoreB);
-        result res = results[scoreStr];
-        res.count += 1;
-        res.addrs.push(addr);
+    function enterResult(uint8 res, uint numToken, address addr) {
+        results[res].verifiers.push(verifierInfo(addr, numToken));
+        results[res].totalToken += numToken;
     }
 
-    function getScoreStr(uint scoreA, uint scoreB) private returns (string) {
-        return "scoreA:scoreB"; // how?
+    function getStartTime() returns (uint){
+        return start;
     }
 
-    function isBetting() returns (bool){
-      return (now < start && now > start - BETTING_TIME);
+    /*
+    Close the game
+    Determine the results
+    Reward participants
+     */
+    function finalize() {
+
+
     }
 
-    function isResult() returns (bool){
-      return (now > start + PLAYING_TIME && now < start + PLAYING_TIME + RESULT_TIME);
+    // Rewarding functions
+    function rewardCreators() private {
+
     }
 
-    function isReward() returns (bool){
-      return (now > start + PLAYING_TIME + RESULT_TIME);
+    function rewardParticipants() private {
+
     }
+
+    function rewardVerifier() private {
+
+    }
+
+
 }
