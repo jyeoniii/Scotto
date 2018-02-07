@@ -1,8 +1,8 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.19;
 
 import "browser/Game.sol";
 import "browser/Common.sol";
-
+import "browser/Creator.sol";
 contract Main is Common{
 
     //constant
@@ -16,16 +16,15 @@ contract Main is Common{
     uint private id = 0;
     Game[] private games;
 
-    mapping (string => creator[]) private creators; // string: identifier of the game
+    mapping (string => Creator[]) private creators; // string: identifier of the game
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) {
         require(isCreatingTime(timestamp) == true);
         // require(tokenAmount >= getCirculation()); // Not Implemented yet
         require(creators[gameInfoStr].length < MIN_CREATORS);
 
-        creator _creator;
-        _creator.addr = msg.sender;
-        _creator.tokenAmount = tokenAmount;
+        Creator _creator = new Creator(msg.sender, tokenAmount);
+
 
         creators[gameInfoStr].push(_creator);
 
