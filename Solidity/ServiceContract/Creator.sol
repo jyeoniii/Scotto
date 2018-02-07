@@ -6,4 +6,12 @@ contract Creator {
         addr = _addr;
         tokenAmount = _tokenAmount;
     }
+
+    function getAddr() returns (address) {
+        return addr;
+    }
+
+    function getTokenAmount() returns (uint){
+        return tokenAmount;
+    }
 }

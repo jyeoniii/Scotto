@@ -5,6 +5,11 @@ import "browser/Common.sol";
 import "browser/Creator.sol";
 contract Main is Common{
 
+    struct tempGame {
+        Creator[] creators;
+        uint totalToken;
+    }
+
     //constant
     uint private constant MIN_CREATORS = 20;
     uint private constant CREATE_START = 7 days;
@@ -16,20 +21,23 @@ contract Main is Common{
     uint private id = 0;
     Game[] private games;
 
-    mapping (string => Creator[]) private creators; // string: identifier of the game
+    mapping (string => tempGame) private tempGames; // string: identifier of the game
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) {
+        tempGame tmpGame = tempGames[gameInfoStr];
+
         require(isCreatingTime(timestamp) == true);
         // require(tokenAmount >= getCirculation()); // Not Implemented yet
-        require(creators[gameInfoStr].length < MIN_CREATORS);
+        require(tmpGame.creators.length < MIN_CREATORS);
 
         Creator _creator = new Creator(msg.sender, tokenAmount);
 
 
-        creators[gameInfoStr].push(_creator);
+        tmpGame.creators.push(_creator);
+        tmpGame.totalToken += tokenAmount;
 
-        if (creators[gameInfoStr].length >= MIN_CREATORS ) {
-            Game game = new Game(id++, creators[gameInfoStr], timestamp);
+        if (tmpGame.creators.length >= MIN_CREATORS ) {
+            Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
         }
     }
