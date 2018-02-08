@@ -1,17 +1,12 @@
-contract Creator {
-    address addr;
-    uint tokenAmount;
+pragma solidity ^0.4.11;
+import "browser/People.sol";
 
-    function Creator (address _addr, uint _tokenAmount) public{
+contract Creator is People{
+
+    function Creator (address _addr, uint _tokenAmount) public {
         addr = _addr;
         tokenAmount = _tokenAmount;
     }
 
-    function getAddr() returns (address) {
-        return addr;
-    }
 
-    function getTokenAmount() returns (uint){
-        return tokenAmount;
-    }
 }

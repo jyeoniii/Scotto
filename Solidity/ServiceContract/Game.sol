@@ -1,23 +1,18 @@
-pragma solidity ^0.4.19;
-import "browser/Common.sol";
+pragma solidity ^0.4.11;
 import "browser/Creator.sol";
+import "browser/Participant.sol";
+import "browser/Verifier.sol";
 
 
-contract Game{
 
-    struct bettingInfo{
-        address addr;
-        uint numEther;
-        uint numToken;
-    }
+contract Game /*is ERC223ReceivingContract*/{
 
-    struct verifierInfo {
-        address addr;
-        uint numToken;
-    }
+
+
+
 
     struct gameResult {
-        verifierInfo[] verifiers;
+        Verifier[] verifiers;
         uint totalToken;
     }
 
@@ -42,15 +37,21 @@ contract Game{
     // game Info
     uint id ; // 게임 고유 id
     uint start; // 시작 시간 timestamp
-    bool[3] finalResult; // 최종 게임 결과
+    uint8[] finalResult; // 최종 게임 결과
+
+
 
     Creator[] creators; // 경기 등록한 사람들 목록
-    mapping(uint8 => bettingInfo[]) betting; //length should be 3
+    mapping(uint8 => Participant[]) betting; //length should be 3
+
+    Participant[] finalWinner;
+
     gameResult[] results;
 
 
     uint creatorTokens = 0;
     uint tokenPool = 0;
+    uint verifierTokenPool = 0;
     uint totalEtherPool = 0;
     uint etherForCompensation = 0;
     uint etherForWinner = 0;
@@ -70,27 +71,27 @@ contract Game{
             2 (bet to B)
             TODO: should be payable
     */
-    function addBettingInfo(address addr, uint numEther, uint numToken, uint8 result) public {
-        require(result>=0 && result<=2);
+    function addBettingInfo(Participant participant) public {
 
-        bettingInfo memory info = bettingInfo(addr, numEther, numToken);
-        betting[result].push(info);
-        resultEtherPool[result] += numEther;
+        uint8 result = participant.getResult();
+        uint etherAmount = participant.getEtherAmount();
 
-        tokenPool += numToken;
-        totalEtherPool += numEther;
+        betting[result].push(participant);
+
+        resultEtherPool[result] += etherAmount;
+        totalEtherPool += etherAmount;
+
+        tokenPool += participant.getTokenAmount();
+
     }
 
-    function enterResult(uint8 res, uint numToken, address addr) public {
-        verifierInfo memory verifier = verifierInfo(addr, numToken);
-
-        results[res].verifiers.push(verifier);
-        results[res].totalToken += numToken;
-
-        tokenPool += numToken;
+    function enterResult(Verifier verifier) public {
+        results[verifier.getResult()].verifiers.push(verifier);
+        results[verifier.getResult()].totalToken += verifier.getTokenAmount();
+        tokenPool += verifier.getTokenAmount();
     }
 
-    function getStartTime() public returns (uint) {
+    function getStartTime() public view returns (uint) {
         return start;
     }
 
@@ -99,17 +100,14 @@ contract Game{
     Determine the results
     Reward participants
      */
-    function finalize() {
-      finalResult = Common.maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
+    function finalize()public {
+      this.maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
 
-      if(finalResult[0])
-          etherForWinner += resultEtherPool[0];
-
-      if(finalResult[1])
-          etherForWinner += resultEtherPool[1];
-
-      if(finalResult[2])
-          etherForWinner += resultEtherPool[2];
+      for(uint8 i = 0; i < finalResult.length; i++){
+        etherForWinner += resultEtherPool[finalResult[i]];
+        initDistribute(finalResult[i]); // refund to winners
+        verifierTokenPool += results[finalResult[i]].totalToken;
+      }
 
       etherForCompensation = totalEtherPool - etherForWinner;
 
@@ -125,31 +123,101 @@ contract Game{
         1. Ether: etherPool * 0.1 * 0.1
         2. Tokens: Same amount with collateralized tokens
     */
-    function rewardCreators() private {
-
-
-
-        uint etherForCreators = etherForCompensation * ETHER_FEE_CREATOR / 10 / 10;
-        address addr;
-        uint tokenAmount;
+    function rewardCreators() public payable {
+        uint etherForCreators = etherForCompensation * 10 * ETHER_FEE_CREATOR / 10;
 
         for (uint i=0; i<creators.length; ++i) {
-            addr = creators[i].getAddr();
-            tokenAmount = creators[i].getTokenAmount();
 
-            addr.transfer(etherForCreators * creators[i].getTokenAmount() / creatorTokens); // ether compensation
+            creators[i].getAddr().transfer(etherForCreators * creators[i].getTokenAmount() / creatorTokens); // ether compensation
             // TODO: Give back collateralized tokens (=tokenAmount)
             // Not implemented yet
         }
     }
 
-    function rewardParticipants() private {
+    function rewardParticipants() public payable {
+
+     uint etherForPariticipants= etherForCompensation * 9 / 10;
+
+
+
+    for(uint8 k = 0; k < finalResult.length; k++)
+      for (uint i=0; i<betting[k].length; ++i)
+         betting[k][i].getAddr().transfer( etherForPariticipants * betting[k][i].getEtherAmount() / etherForWinner); // ether compensation
 
     }
 
-    function rewardVerifier() private {
+    function rewardVerifier()  public payable {
+    uint etherForVerifiers = etherForCompensation / 10 * ETHER_FEE_VERIFIER / 10;
+
+        for(uint8 i = 0 ; i < finalResult.length; i ++)
+        for (uint j=0; j < results[i].verifiers.length; j ++ ) {
+            results[i].verifiers[j].getAddr().transfer(etherForVerifiers * results[i].verifiers[j].getTokenAmount() / verifierTokenPool); // ether compensation
+        }
+    }
+
+    function initDistribute(uint8 result) public payable {
+        address addr;
+        for (uint i=0; i<betting[result].length; ++i) {
+            addr = betting[result][i].getAddr();
+            addr.transfer(betting[result][i].getEtherAmount()); // ether compensation
+        }
+    }
+
+    function maxResult(uint a, uint b, uint c) external returns (uint8[]){
+
+       if(a > b){
+            if(b >= c )
+            // winner[0] = true; // a > b >= c
+            finalResult = [0];
+            else if(a > c)
+                // winner[0] = true; // a > c > b
+                finalResult = [0];
+            else if(a < c)
+                // winner[2] = true; // c > a > b
+                finalResult = [2];
+            else if( a== c){  // a == c > b
+                // winner[0] = true;
+                // winner[2] = true;
+                finalResult = [0,2];
+            }
+
+        }
+        else if(a < b){
+            if( a >= c)
+            // winner[1] = true; //b > a >= c
+            finalResult = [1];
+            else if( b > c)
+            // winner[1] = true; // b > c > a
+            finalResult = [1];
+            else if( b < c)
+            // winner[2] = true;
+            finalResult = [2];
+            else if( b == c){
+                // winner[1] = true;
+                // winner[2] = true;
+                finalResult = [1,2];
+            }
+        }
+
+        else if(a == b){
+             if(a < c)
+            //  winner[2] = true;
+            finalResult = [2];
+            else if( a > c) {
+                // winner[0] = true;
+                // winner[1] = true;
+                finalResult = [0,1];
+            }
+            else{
+                // winner[0] = true;
+                // winner[1] = true;
+                // winner[2] = true;
+                finalResult = [0,1,2];
+            }
+        }
 
     }
+
 
 
 }

@@ -1,14 +1,14 @@
-pragma solidity ^0.4.19;
-
+pragma solidity ^0.4.11;
 import "browser/Game.sol";
-import "browser/Common.sol";
-import "browser/Creator.sol";
+import "browser/Verifier.sol";
+
 contract Main {
 
     struct tempGame {
         Creator[] creators;
         uint totalToken;
     }
+
 
     //constant
     uint private constant MIN_CREATORS = 20;
@@ -23,12 +23,12 @@ contract Main {
 
     mapping (string => tempGame) private tempGames; // string: identifier of the game
 
-    function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) {
-        tempGame tmpGame = tempGames[gameInfoStr];
+    function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public{
+        tempGame storage tmpGame = tempGames[gameInfoStr];
 
-        require(isCreatingTime(timestamp) == true);
+        //require(isCreatingTime(timestamp) == true);
         // require(tokenAmount >= getCirculation()); // Not Implemented yet
-        require(tmpGame.creators.length < MIN_CREATORS);
+        // require(tmpGame.creators.length < MIN_CREATORS);
 
         Creator _creator = new Creator(msg.sender, tokenAmount);
 
@@ -40,45 +40,49 @@ contract Main {
             Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
         }
+
+
     }
 
-    function betGame(uint id, uint numEther, uint numToken, uint8 result) {
+    function betGame(uint _id, uint numToken, uint8 result) public payable {
+        // require(result>= 0 && result <= 2);
         Game game = games[id];
-        require(isBettingTime(game));
-        games[id].addBettingInfo(msg.sender, numEther, numToken, result);
-    }
-
-
-    function enterResult(uint id, uint numToken, uint8 result) {
-        Game game = games[id];
-        require(isResultTime(game));
-        game.enterResult(result, numToken, msg.sender);
+        // require(isBettingTime(game));
+        games[_id].addBettingInfo(new Participant(msg.sender, msg.value, numToken, result));
     }
 
 
-    function checkResult(uint id) { // when user triggers event after the result has been decided
-        Game game = games[id];
-        require(isRewardingTime(game));
+    function enterResult(uint _id, uint numToken, uint8 result) public {
+        Game game = games[_id];
+        // require(isResultTime(game));
+       game.enterResult(new Verifier(msg.sender, numToken, result));
+    }
+
+
+    function checkResult(uint _id) public { // when user triggers event after the result has been decided
+        Game game = games[_id];
+        // require(isRewardingTime(game));
         game.finalize();
     }
 
     /* Functions checking game status */
-    function isCreatingTime(uint start) public returns (bool){
+    function isCreatingTime(uint start) private view returns (bool){
         return ( now >= start - CREATE_START && now <start - CREATE_PERIOD ); // 임시
     }
 
-    function isBettingTime(Game game) returns (bool){
+    function isBettingTime(Game game) private view returns (bool){
         uint start = game.getStartTime();
         return (now < start && now > start - BETTING_TIME);
     }
 
-    function isResultTime(Game game) returns (bool){
+    function isResultTime(Game game) private view returns (bool){
         uint start = game.getStartTime();
         return (now > start + PLAYING_TIME && now < start + PLAYING_TIME + RESULT_TIME);
     }
 
-    function isRewardingTime(Game game) returns (bool){
+    function isRewardingTime(Game game) private view returns (bool){
         uint start = game.getStartTime();
         return (now > start + PLAYING_TIME + RESULT_TIME);
     }
+
 }
