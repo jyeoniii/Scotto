@@ -7,7 +7,9 @@
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
   <!--Import JQuery-->
+  <!--
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  -->
   {% block head_content %}
   {% endblock head_content %}
 </head>
@@ -23,7 +25,29 @@
         {% endblock content %}
       </div>
     </div>
+
   </div>
 
 </body>
+
+<script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>
+<script>
+  console.log('abc');
+  window.addEventListener('load', function() {
+  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+  console.log('def');
+  if (typeof web3 !== 'undefined') {
+    // Use Mist/MetaMask's provider
+    window.web3 = new Web3(web3.currentProvider);
+    console.log('Successfully got metamask web3');
+  } else {
+    console.log('No web3? You should consider trying MetaMask!')
+    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+    window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    }
+    // Now you can start your app & access web3 freely:
+  })
+  {% block script %}
+  {% endblock script %}
+</script>
 </html>
