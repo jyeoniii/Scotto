@@ -23,7 +23,7 @@ contract Main {
 
     mapping (string => tempGame) private tempGames; // string: identifier of the game
 
-    function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public{
+    function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
         tempGame storage tmpGame = tempGames[gameInfoStr];
 
         //require(isCreatingTime(timestamp) == true);
@@ -36,17 +36,17 @@ contract Main {
         tmpGame.creators.push(_creator);
         tmpGame.totalToken += tokenAmount;
 
-        if (tmpGame.creators.length >= MIN_CREATORS ) {
+        if (tmpGame.creators.length >= 1 ) {
             Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
         }
 
-
+        return games;
     }
 
     function betGame(uint _id, uint numToken, uint8 result) public payable {
         // require(result>= 0 && result <= 2);
-        Game game = games[id];
+        Game game = games[_id];
         // require(isBettingTime(game));
         games[_id].addBettingInfo(new Participant(msg.sender, msg.value, numToken, result));
     }
@@ -84,5 +84,7 @@ contract Main {
         uint start = game.getStartTime();
         return (now > start + PLAYING_TIME + RESULT_TIME);
     }
+
+
 
 }

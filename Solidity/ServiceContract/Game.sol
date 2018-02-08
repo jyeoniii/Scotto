@@ -46,7 +46,7 @@ contract Game /*is ERC223ReceivingContract*/{
 
     Participant[] finalWinner;
 
-    gameResult[] results;
+    gameResult[3] results;
 
 
     uint creatorTokens = 0;
@@ -86,9 +86,9 @@ contract Game /*is ERC223ReceivingContract*/{
     }
 
     function enterResult(Verifier verifier) public {
-        results[verifier.getResult()].verifiers.push(verifier);
-        results[verifier.getResult()].totalToken += verifier.getTokenAmount();
-        tokenPool += verifier.getTokenAmount();
+         results[verifier.getResult()].verifiers.push(verifier);
+         results[verifier.getResult()].totalToken += verifier.getTokenAmount();
+         tokenPool += verifier.getTokenAmount();
     }
 
     function getStartTime() public view returns (uint) {
@@ -100,7 +100,7 @@ contract Game /*is ERC223ReceivingContract*/{
     Determine the results
     Reward participants
      */
-    function finalize()public {
+    function finalize()public returns (uint8[]) {
       this.maxResult(results[0].totalToken, results[1].totalToken, results[2].totalToken);
 
       for(uint8 i = 0; i < finalResult.length; i++){
@@ -109,7 +109,7 @@ contract Game /*is ERC223ReceivingContract*/{
         verifierTokenPool += results[finalResult[i]].totalToken;
       }
 
-      etherForCompensation = totalEtherPool - etherForWinner;
+    //   etherForCompensation = totalEtherPool - etherForWinner;
 
     //   reward();
     //   myAddress.transfer(etherForCompensation * 8 / 10 /10 );
@@ -163,14 +163,14 @@ contract Game /*is ERC223ReceivingContract*/{
         }
     }
 
-    function maxResult(uint a, uint b, uint c) external returns (uint8[]){
+    function maxResult(uint a, uint b, uint c) external {
 
        if(a > b){
             if(b >= c )
             // winner[0] = true; // a > b >= c
             finalResult = [0];
             else if(a > c)
-                // winner[0] = true; // a > c > b
+                // winner[0]  = true; // a > c > b
                 finalResult = [0];
             else if(a < c)
                 // winner[2] = true; // c > a > b
