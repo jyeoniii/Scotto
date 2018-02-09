@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Scotto!</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href='{% static "home/vendor/bootstrap/css/bootstrap.min.css" %}' rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href='{% static "home/vendor/font-awesome/css/font-awesome.min.css" %}' rel="stylesheet" type="text/css">
+    <link href='{% static "home/vendor/simple-line-icons/css/simple-line-icons.css" %}' rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href='{% static "home/css/landing-page.min.css" %}' rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-light static-top" style="background-color:#556B2F">
+      <div class="container">
+        <a class="navbar-brand" style="color:#F0FFFF;font-style:bold" href="#">Welcome to Scotto!</a>
+        <a id="accountAddr" style="color:#F0FFFF"></a>
+      </div>
+    </nav>
+
+    <!-- Masthead -->
+    <header class="masthead text-white text-center" style="background-img:url('{% static "../img.soccer.jpg" %}')">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-9 mx-auto">
+            <h1 class="mb-5">Scotto</h1>
+            <h3 class="mb-5">Predict the result of soccer games <br>based on Ethereum Smart Contract!</h3>
+          </div>
+          <div class="col-xl-9 mx-auto">
+            <form class="mb-5">
+              <div class="form-row col-md-12 mx-auto">
+                <!-- TeamA -->
+                 <div class="col-md-3" id="teamA">
+                   <select class="form-control" name="TeamA">
+                     <optgroup label="TeamA">
+                       <option disabled selected hidden>Team</option>
+                       <option>a</option>
+                       <option>b</option>
+                       <option>c</option>
+                     </optgroup>
+                   </select>
+                 </div>
+               
+                 <!-- TeamB -->
+                 <div class="col-md-3" id="teamB">
+                   <select class="form-control" name="TeamB">
+                     <optgroup label="TeamB">
+                       <option disabled selected hidden>Team</option>
+                       <option>a</option>
+                       <option>b</option>
+                       <option>c</option>
+                     </optgroup>
+                   </select>
+                 </div>
+                 <br>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </header>
+
+
+    <!-- Bootstrap core JavaScript -->
+    <!--
+    <script src='{% static "vendor/jquery/jquery.min.js" %}'></script>
+    <script src='{% static "vendor/bootstrap/js/bootstrap.bundle.min.js" %}'></script>
+    -->
+
+  </body>
+
+  <script>
+    web3.eth.getAccounts(function(e,r){
+      if (r.length > 0){
+        document.getElementById('accountAddr').innerHTML = 'Address: '; 
+        document.getElementById('accountAddr').innerHTML += r[0];
+      } else {
+        document.getElementById('accountAddr').innerHTML = "Please sign in to Metamask first!"
+      }
+    });
+  </script>
+
+</html>
