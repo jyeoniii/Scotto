@@ -57,7 +57,7 @@ contract Scottoken is ERC20 {
     }
 
     function approve(address _spender, uint _value) public returns (bool success) {
-        __allowances[msg.sender][_spender] = _value;
+        __allowances[msg.sender][_spender] += _value;
         return true;
     }
 

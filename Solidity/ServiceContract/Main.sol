@@ -10,7 +10,6 @@ contract Main is Scottoken{
         uint totalToken;
     }
 
-    ERC20 token = ERC20(0x216908F1849B96E15C0c528268e81D0B6940D41B);
 
     //constant
     uint private constant MIN_CREATORS = 20;
@@ -26,22 +25,22 @@ contract Main is Scottoken{
     mapping (string => tempGame) private tempGames; // string: identifier of the game
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
-        tempGame storage tmpGame = tempGames[gameInfoStr];
-
+        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
         //require(isCreatingTime(timestamp) == true);
         // require(tokenAmount >= getCirculation()); // Not Implemented yet
         // require(tmpGame.creators.length < MIN_CREATORS);
 
+        tempGame storage tmpGame = tempGames[gameInfoStr];
         Creator _creator = new Creator(msg.sender, tokenAmount);
+
         tmpGame.creators.push(_creator);
         tmpGame.totalToken += tokenAmount;
 
-
         // token transfer process
-        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
-            __balanceOf[msg.sender] -= tokenAmount;
-            __balanceOf[this] += tokenAmount;
+        __balanceOf[msg.sender] -= tokenAmount;
+        __balanceOf[this] += tokenAmount;
 
+        // Create game if condition is met
         if (tmpGame.creators.length >= 1 ) {
             Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
@@ -53,17 +52,16 @@ contract Main is Scottoken{
     }
 
     function betGame(uint _id, uint tokenAmount, uint8 result) public payable {
-        // require(result>= 0 && result <= 2);
-        Game game = games[_id];
+        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
+        require(result>= 0 && result <= 2);
         // require(isBettingTime(game));
+
+        Game game = games[_id];
         game.addBettingInfo(new Participant(msg.sender, msg.value, tokenAmount, result));
 
-
         //token transfer process
-        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
-            __balanceOf[msg.sender] -= tokenAmount;
-            __balanceOf[this] += tokenAmount;
-
+        __balanceOf[msg.sender] -= tokenAmount;
+        __balanceOf[this] += tokenAmount;
 
         this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
 
@@ -71,8 +69,8 @@ contract Main is Scottoken{
 
 
     function enterResult(uint _id, uint tokenAmount, uint8 result) public {
-        Game game = games[_id];
-        // require(isResultTime(game));
+       // require(isResultTime(game));
+       Game game = games[_id];
        game.enterResult(new Verifier(msg.sender, tokenAmount, result));
 
        this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
