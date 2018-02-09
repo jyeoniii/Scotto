@@ -4,6 +4,7 @@
 
   <head>
 
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -21,6 +22,10 @@
 
     <!-- Custom styles for this template -->
     <link href='{% static "home/css/landing-page.min.css" %}' rel="stylesheet">
+
+    <!-- Style for Datetime picker -->
+    <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
+    <!--<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">-->
 
   </head>
 
@@ -47,32 +52,41 @@
             <form class="mb-5">
               <div class="form-row col-md-12 mx-auto">
                 <!-- TeamA -->
-                 <div class="col-md-3" id="teamA">
-                   <select class="form-control" name="TeamA">
+                 <div class="col-md-3">
+                   <select class="form-control" id="teamA_selected">
                      <optgroup label="TeamA">
                        <option disabled selected hidden>Team</option>
-                       <option>a</option>
-                       <option>b</option>
-                       <option>c</option>
+                       <option>South Korea</option>
+                       <option>Japan</option>
+                       <option>Taiwan</option>
                      </optgroup>
                    </select>
                  </div>
-               
+
                  <!-- TeamB -->
-                 <div class="col-md-3" id="teamB">
-                   <select class="form-control" name="TeamB">
+                 <div class="col-md-3">
+                   <select class="form-control" id="teamB_selected">
                      <optgroup label="TeamB">
                        <option disabled selected hidden>Team</option>
-                       <option>a</option>
-                       <option>b</option>
-                       <option>c</option>
+                       <option>Spain</option>
+                       <option>France</option>
+                       <option>Sweden</option>
                      </optgroup>
                    </select>
                  </div>
-                 <br>
-                </div>
-            </form>
+
+                 <!-- Datetime picker-->
+                 <div class="input-group date form_datetime col-md-4" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                    <input class="form-control" size="16" type="text" value="" readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+					          <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                 </div>
+				         <input type="hidden" id="dtp_input1" value="" /><br/>
+           </form>
+           <!-- Token Amount -->
+           <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="No.tokens">
           </div>
+          <button class="col-md-6 btn btn-primary" style="margin-left:10px" onclick="createGame()">Submit</button>
         </div>
       </div>
     </header>
@@ -84,17 +98,59 @@
     <script src='{% static "vendor/bootstrap/js/bootstrap.bundle.min.js" %}'></script>
     -->
 
-  </body>
+  <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
 
-  <script>
-    web3.eth.getAccounts(function(e,r){
-      if (r.length > 0){
-        document.getElementById('accountAddr').innerHTML = 'Address: '; 
-        document.getElementById('accountAddr').innerHTML += r[0];
-      } else {
-        document.getElementById('accountAddr').innerHTML = "Please sign in to Metamask first!"
-      }
-    });
+  <script type="text/javascript">
+
+  // datetimepicker
+  $('.form_datetime').datetimepicker({
+      //language:  'fr',
+      weekStart: 1,
+      todayBtn:  1,
+	autoclose: 1,
+	todayHighlight: 1,
+	startView: 2,
+	forceParse: 0,
+  showMeridian: 1
+  });
+
+  // web3
+  web3.eth.getAccounts(function(e,r){
+    if (r.length > 0){
+      document.getElementById('accountAddr').innerHTML = 'Address: '; 
+      document.getElementById('accountAddr').innerHTML += r[0];
+    } else {
+      document.getElementById('accountAddr').innerHTML = "Please sign in to Metamask first!"
+    }
+  });
+
+  // Select Teams
+  function createGame() {
+    var teamA_opt = document.getElementById('teamA_selected');
+    var teamB_opt = document.getElementById('teamB_selected');
+
+    var teamA = teamA_opt[teamA_opt.selectedIndex].value;
+    var teamB = teamB_opt[teamB_opt.selectedIndex].value;
+    var game_date = $('.form_datetime').data('datetimepicker').getDate();
+    var formatted = game_date.getFullYear().toString() + (game_date.getMonth()+1).toString() + game_date.getDate().toString()+game_date.getHours().toString() + game_date.getMinutes().toString();
+    var tokenAmount = document.getElementById('create_token_amount').value;
+
+    console.log(teamA);
+    console.log(teamB);
+    console.log(game_date);
+    console.log(formatted);
+    console.log(tokenAmount);
+  }
+
+  function test() { } 
+
   </script>
+  
 
+
+
+  </body>
 </html>
