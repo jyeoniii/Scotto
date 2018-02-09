@@ -39,20 +39,20 @@ contract Game {
     uint id ; // 게임 고유 id
     uint start; // 시작 시간 timestamp
     uint8[] finalResult; // 최종 게임 결과
+    uint8[] loseResult; // wrong game result
 
 
 
     Creator[] creators; // 경기 등록한 사람들 목록
     mapping(uint8 => Participant[]) betting; //length should be 3
 
-    Participant[] finalWinner;
-
     gameResult[3] results;
 
 
     uint creatorTokens = 0;
-    uint tokenPool = 0;
-    uint verifierTokenPool = 0;
+    uint rewardTokenPool = 0;
+    uint rightVerifierTokenPool = 0;
+    uint wrongVerifierTokenPool = 0;
     uint totalEtherPool = 0;
     uint etherForCompensation = 0;
     uint etherForWinner = 0;
@@ -63,7 +63,7 @@ contract Game {
         creators = _creators;
         start = timestamp;
         creatorTokens = _creatorTokens;
-        tokenPool += _creatorTokens;
+
 
         token =  ERC20(msg.sender); //use SCOTTOKEN instance
     }
@@ -84,14 +84,14 @@ contract Game {
         resultEtherPool[result] += etherAmount;
         totalEtherPool += etherAmount;
 
-        tokenPool += participant.getTokenAmount();
+        rewardTokenPool += participant.getTokenAmount();
 
     }
 
     function enterResult(Verifier verifier) public {
          results[verifier.getResult()].verifiers.push(verifier);
          results[verifier.getResult()].totalToken += verifier.getTokenAmount();
-         tokenPool += verifier.getTokenAmount();
+         rewardTokenPool += verifier.getTokenAmount();
     }
 
     function getStartTime() public view returns (uint) {
@@ -108,10 +108,12 @@ contract Game {
 
       for(uint8 i = 0; i < finalResult.length; i++){
         etherForWinner += resultEtherPool[finalResult[i]];
-        initDistribute(finalResult[i]); // refund to winners
-        verifierTokenPool += results[finalResult[i]].totalToken;
+        initDistribute(finalResult[i]); // give ether back to winners
+        rightVerifierTokenPool += results[finalResult[i]].totalToken;
       }
 
+
+      rewardTokenPool = rewardTokenPool - rightVerifierTokenPool;
     //   etherForCompensation = totalEtherPool - etherForWinner;
 
     //   reward();
@@ -128,41 +130,82 @@ contract Game {
     */
     function rewardCreators() public payable {
         uint etherForCreators = etherForCompensation * 10 * ETHER_FEE_CREATOR / 10;
+        uint tokenForCreators = rewardTokenPool * 3 / 10;
 
+
+
+        // give token back to creators
         for (uint i=0; i<creators.length; ++i) {
-
-            creators[i].getAddr().transfer(etherForCreators * creators[i].getTokenAmount() / creatorTokens); // ether compensation
-            // TODO: Give back collateralized tokens (=tokenAmount)
-            // Not implemented yet
+            token.transferFrom(token, creators[i], creators[i].getTokenAmount());
         }
+
+        // token compensation for creators
+        for (i=0; i<creators.length; ++i) {
+            token.transferFrom(token, creators[i],tokenForCreators * creators[i].getTokenAmount() / creatorTokens);
+        }
+
+
+        // ethereum compensation for creators
+        for (i=0; i<creators.length; ++i) {
+            creators[i].getAddr().transfer(etherForCreators * creators[i].getTokenAmount() / creatorTokens);
+
+        }
+
+
     }
 
     function rewardParticipants() public payable {
 
-     uint etherForPariticipants= etherForCompensation * 9 / 10;
-
-
+    uint etherForPariticipants= etherForCompensation * 9 / 10;
+    uint tokenForWinners = rewardTokenPool * 1 / 10;
+    uint tokenForLosers = rewardTokenPool * 3 / 10;
+    Participant part;
 
     for(uint8 k = 0; k < finalResult.length; k++)
-      for (uint i=0; i<betting[k].length; ++i)
-         betting[k][i].getAddr().transfer( etherForPariticipants * betting[k][i].getEtherAmount() / etherForWinner); // ether compensation
+      for (uint i=0; i<betting[k].length; ++i) {
+          part = betting[k][i];
+         address(part).transfer( etherForPariticipants * part.getEtherAmount() / etherForWinner); // ether compensation
+         token.transferFrom(token,address(part),tokenForWinners * part.getEtherAmount() / etherForWinner );
+      }
+
+     for( k = 0; k < loseResult.length; k++)
+      for ( i=0; i<betting[k].length; ++i) {
+          part = betting[k][i];
+
+         token.transferFrom(token,address(part),tokenForLosers * part.getEtherAmount() / etherForWinner );
+      }
 
     }
 
-    function rewardVerifier()  public payable {
+    function rewardVerifier() public payable {
     uint etherForVerifiers = etherForCompensation / 10 * ETHER_FEE_VERIFIER / 10;
+    uint tokenForVerifiers = rewardTokenPool * 3 / 10;
 
         for(uint8 i = 0 ; i < finalResult.length; i ++)
-        for (uint j=0; j < results[i].verifiers.length; j ++ ) {
-            results[i].verifiers[j].getAddr().transfer(etherForVerifiers * results[i].verifiers[j].getTokenAmount() / verifierTokenPool); // ether compensation
-        }
+            for (uint j=0; j < results[i].verifiers.length; j ++ ) {
+                address ver = results[i].verifiers[j].getAddr();
+
+                // ether compensation for verifiers
+                ver.transfer(etherForVerifiers * results[i].verifiers[j].getTokenAmount() / rightVerifierTokenPool); // ether compensation
+                // token compensation for verifiers
+                token.transferFrom(token, ver, tokenForVerifiers * results[i].verifiers[j].getTokenAmount() / rightVerifierTokenPool);
+            }
+
+
+
     }
 
     function initDistribute(uint8 result) public payable {
-        address addr;
-        for (uint i=0; i<betting[result].length; ++i) {
-            addr = betting[result][i].getAddr();
-            addr.transfer(betting[result][i].getEtherAmount()); // ether compensation
+
+        //give token back to winners
+        for (uint i=0; i<betting[result].length; ++i){
+            betting[result][i].getAddr().transfer(betting[result][i].getEtherAmount()); // ether compensation
+        }
+
+        //give token back to right verifiers
+        for ( i = 0; i < results[result].verifiers.length; ++i){
+            Verifier ver = results[result].verifiers[i];
+            token.transferFrom(token, address(ver), ver.getTokenAmount());
         }
     }
 
@@ -170,33 +213,62 @@ contract Game {
 
        if(a > b){
             if(b >= c )
-                finalResult = [0];
+                {
+                    finalResult = [0];
+                    loseResult = [1,2];
+
+                }
             else if(a > c)
-                finalResult = [0];
+               {
+                   finalResult = [0];
+                   loseResult = [1,2];
+               }
             else if(a < c)
-                finalResult = [2];
+                {
+                    finalResult = [2];
+                    loseResult = [0,1];
+                }
             else if( a== c){
-                finalResult = [0,2];
+               {
+                   finalResult = [0,2];
+                   loseResult = [1];
+               }
             }
 
         }
         else if(a < b){
             if( a >= c)
-            finalResult = [1];
+            {
+                finalResult = [1];
+                loseResult = [0,2];
+            }
             else if( b > c)
-            finalResult = [1];
+            {
+                finalResult = [1];
+                loseResult = [0,2];
+            }
             else if( b < c)
-            finalResult = [2];
+           {
+               finalResult = [2];
+               loseResult = [0,1];
+           }
             else if( b == c){
-                finalResult = [1,2];
+               {
+                   finalResult = [1,2];
+                   loseResult [0];
+               }
             }
         }
 
         else if(a == b){
              if(a < c)
-            finalResult = [2];
+          {
+              finalResult = [2];
+              loseResult = [0,1];
+          }
             else if( a > c) {
                 finalResult = [0,1];
+                loseResult = [2];
             }
             else{
                 finalResult = [0,1,2];
