@@ -1,14 +1,16 @@
 pragma solidity ^0.4.11;
 import "browser/Game.sol";
-import "browser/Verifier.sol";
 
-contract Main {
+import "browser/Token.sol";
+
+contract Main is Scottoken{
 
     struct tempGame {
         Creator[] creators;
         uint totalToken;
     }
 
+    ERC20 token = ERC20(0x216908F1849B96E15C0c528268e81D0B6940D41B);
 
     //constant
     uint private constant MIN_CREATORS = 20;
@@ -31,31 +33,49 @@ contract Main {
         // require(tmpGame.creators.length < MIN_CREATORS);
 
         Creator _creator = new Creator(msg.sender, tokenAmount);
-
-
         tmpGame.creators.push(_creator);
         tmpGame.totalToken += tokenAmount;
+
+
+        // token transfer process
+        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
+            __balanceOf[msg.sender] -= tokenAmount;
+            __balanceOf[this] += tokenAmount;
 
         if (tmpGame.creators.length >= 1 ) {
             Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
+            this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
         }
+
 
         return games;
     }
 
-    function betGame(uint _id, uint numToken, uint8 result) public payable {
+    function betGame(uint _id, uint tokenAmount, uint8 result) public payable {
         // require(result>= 0 && result <= 2);
         Game game = games[_id];
         // require(isBettingTime(game));
-        games[_id].addBettingInfo(new Participant(msg.sender, msg.value, numToken, result));
+        game.addBettingInfo(new Participant(msg.sender, msg.value, tokenAmount, result));
+
+
+        //token transfer process
+        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
+            __balanceOf[msg.sender] -= tokenAmount;
+            __balanceOf[this] += tokenAmount;
+
+
+        this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
+
     }
 
 
-    function enterResult(uint _id, uint numToken, uint8 result) public {
+    function enterResult(uint _id, uint tokenAmount, uint8 result) public {
         Game game = games[_id];
         // require(isResultTime(game));
-       game.enterResult(new Verifier(msg.sender, numToken, result));
+       game.enterResult(new Verifier(msg.sender, tokenAmount, result));
+
+       this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
     }
 
 

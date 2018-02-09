@@ -2,12 +2,13 @@ pragma solidity ^0.4.11;
 import "browser/Creator.sol";
 import "browser/Participant.sol";
 import "browser/Verifier.sol";
+import "browser/Token.sol";
+
+contract Game {
 
 
-
-contract Game /*is ERC223ReceivingContract*/{
-
-
+   ERC20 token;
+   event RewardLog();
 
 
 
@@ -63,6 +64,8 @@ contract Game /*is ERC223ReceivingContract*/{
         start = timestamp;
         creatorTokens = _creatorTokens;
         tokenPool += _creatorTokens;
+
+        token =  ERC20(msg.sender); //use SCOTTOKEN instance
     }
 
     /*
@@ -167,51 +170,35 @@ contract Game /*is ERC223ReceivingContract*/{
 
        if(a > b){
             if(b >= c )
-            // winner[0] = true; // a > b >= c
-            finalResult = [0];
+                finalResult = [0];
             else if(a > c)
-                // winner[0]  = true; // a > c > b
                 finalResult = [0];
             else if(a < c)
-                // winner[2] = true; // c > a > b
                 finalResult = [2];
-            else if( a== c){  // a == c > b
-                // winner[0] = true;
-                // winner[2] = true;
+            else if( a== c){
                 finalResult = [0,2];
             }
 
         }
         else if(a < b){
             if( a >= c)
-            // winner[1] = true; //b > a >= c
             finalResult = [1];
             else if( b > c)
-            // winner[1] = true; // b > c > a
             finalResult = [1];
             else if( b < c)
-            // winner[2] = true;
             finalResult = [2];
             else if( b == c){
-                // winner[1] = true;
-                // winner[2] = true;
                 finalResult = [1,2];
             }
         }
 
         else if(a == b){
              if(a < c)
-            //  winner[2] = true;
             finalResult = [2];
             else if( a > c) {
-                // winner[0] = true;
-                // winner[1] = true;
                 finalResult = [0,1];
             }
             else{
-                // winner[0] = true;
-                // winner[1] = true;
-                // winner[2] = true;
                 finalResult = [0,1,2];
             }
         }
