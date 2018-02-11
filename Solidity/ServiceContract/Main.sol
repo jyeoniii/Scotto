@@ -59,6 +59,7 @@ contract Main is Scottoken{
 
         Game game = games[_id];
         game.addBettingInfo(msg.sender, msg.value, tokenAmount, result);
+        game.transfer(msg.value);
 
         //token transfer process
         __balanceOf[msg.sender] -= tokenAmount;
@@ -70,9 +71,12 @@ contract Main is Scottoken{
 
 
     function enterResult(uint _id, uint tokenAmount, uint8 result) public {
-       // require(isResultTime(game));
-       Game game = games[_id];
-       game.enterResult(msg.sender, tokenAmount, result);
+        // require(isResultTime(game));
+        Game game = games[_id];
+        game.enterResult(msg.sender, tokenAmount, result);
+
+       __balanceOf[msg.sender] -= tokenAmount;
+       __balanceOf[this] += tokenAmount;
 
        this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
     }
