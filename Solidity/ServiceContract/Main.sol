@@ -48,6 +48,7 @@ contract Main is Scottoken{
         }
 
 
+
         return games;
     }
 
@@ -57,7 +58,7 @@ contract Main is Scottoken{
         // require(isBettingTime(game));
 
         Game game = games[_id];
-        game.addBettingInfo(new Participant(msg.sender, msg.value, tokenAmount, result));
+        game.addBettingInfo(msg.sender, msg.value, tokenAmount, result);
 
         //token transfer process
         __balanceOf[msg.sender] -= tokenAmount;
@@ -71,7 +72,7 @@ contract Main is Scottoken{
     function enterResult(uint _id, uint tokenAmount, uint8 result) public {
        // require(isResultTime(game));
        Game game = games[_id];
-       game.enterResult(new Verifier(msg.sender, tokenAmount, result));
+       game.enterResult(msg.sender, tokenAmount, result);
 
        this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
     }
@@ -101,6 +102,10 @@ contract Main is Scottoken{
     function isRewardingTime(Game game) private view returns (bool){
         uint start = game.getStartTime();
         return (now > start + PLAYING_TIME + RESULT_TIME);
+    }
+
+    function tes() returns (address) {
+        return games[0].test();
     }
 
 
