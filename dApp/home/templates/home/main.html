@@ -1,16 +1,23 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 
 <head>
+  <title>Scotto!</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
   <link rel="stylesheet" href="https://v40.pingendo.com/assets/4.0.0/default/theme.css" type="text/css"> </head>
 
+  <!-- Style for Datetime picker -->
+  <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
+
+
 <body style="background-color:black; color:#f2f2f2">
+  <!-- Nav bar -->
   <nav class="navbar navbar-expand-md bg-primary navbar-dark">
     <div class="container">
-      <a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-cloud"></i><b>  Brand</b></a>
+      <a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-cloud"></i><b>  Scotto</b></a>
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent" aria-controls="navbar2SupportedContent" aria-expanded="false"
         aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
       <div class="collapse navbar-collapse text-center justify-content-end" id="navbar2SupportedContent">
@@ -22,23 +29,66 @@
             <a class="nav-link" href="#"><i class="fa d-inline fa-lg fa-envelope-o"></i> Contacts</a>
           </li>
         </ul>
-        <a class="btn navbar-btn ml-2 text-white btn-secondary"><i class="fa d-inline fa-lg fa-user-circle-o"></i> Sign in</a>
+        <a class="btn navbar-btn ml-2 text-white btn-secondary" id="accountAddr"><i class="fa d-inline fa-lg fa-user-circle-o"></i> </a>
       </div>
     </div>
   </nav>
+
+  <!-- Header -->
   <div class="py-5 text-center h-100" style="background-image: url(&quot;http://www.hdwallpaperup.com/wp-content/uploads/2015/07/Soccer-Beautiful-High-Quality-Wallpaper-1440x900.jpg&quot;);">
     <div class="container py-5">
       <div class="row">
         <div class="col-md-12">
-          <h1 class="display-3 mb-4 text-primary">Hero image intro</h1>
-          <p class="lead mb-5">Pingendo is a HTML editor for everyone. Easy for newbies, useful for professionals.
-            <br>Code quality is a must. Pingendo generates clean, battle-tested, modular Bootstrap 4 code. </p>
-          <a href="#" class="btn btn-lg mx-1 btn-secondary">A claim here</a>
-          <a href="#" class="btn btn-lg btn-primary mx-1">Your call to action</a>
+          <h1 class="display-3 mb-4 text-primary">Scotto</h1>
+          <h3 class="lead mb-5"> Predict the result of soccer games<br>based on Etherum Smart Contract!</h3>
         </div>
+
+        <div class="col-xl-9 mx-auto">
+            <form class="mb-5">
+              <div class="form-row col-md-12 mx-auto">
+                <!-- TeamA -->
+                 <div class="col-md-3">
+                   <select class="form-control" id="teamA_selected">
+                     <optgroup label="TeamA">
+                       <option disabled selected hidden>Team</option>
+                       <option>South Korea</option>
+                       <option>Japan</option>
+                       <option>Taiwan</option>
+                     </optgroup>
+                   </select>
+                 </div>
+
+                 <!-- TeamB -->
+                 <div class="col-md-3">
+                   <select class="form-control" id="teamB_selected">
+                     <optgroup label="TeamB">
+                       <option disabled selected hidden>Team</option>
+                       <option>Spain</option>
+                       <option>France</option>
+                       <option>Sweden</option>
+                     </optgroup>
+                   </select>
+                 </div>
+
+                 <!-- Datetime picker-->
+                 <div class="input-group date form_datetime col-md-4" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                    <input class="form-control" size="16" type="text" value="" readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+					          <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                 </div>
+				         <input type="hidden" id="dtp_input1" value="" /><br/>
+           </form>
+           <!-- Token Amount -->
+           <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="No.tokens">
+          </div>
+          <button class="col-md-6 btn btn-lg btn-secondary" style="margin-left:10px" onclick="createGame()">Submit</button>
+
+
       </div>
     </div>
   </div>
+
+  <!-- Table -->
   <div class="py-5">
     <div class="container">
       <div class="row">
@@ -186,6 +236,61 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
     <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
+
+
+  <!-- Datetime picker -->
+  <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
+
+  <script type="text/javascript">
+
+  // datetimepicker
+  $('.form_datetime').datetimepicker({
+      //language:  'fr',
+      weekStart: 1,
+      todayBtn:  1,
+	autoclose: 1,
+	todayHighlight: 1,
+	startView: 2,
+	forceParse: 0,
+  showMeridian: 1
+  });
+
+  // web3
+  web3.eth.getAccounts(function(e,r){
+    if (r.length > 0){
+      document.getElementById('accountAddr').innerHTML += r[0];
+    } else {
+      document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!"
+    }
+  });
+
+  // Select Teams
+  function createGame() {
+    var teamA_opt = document.getElementById('teamA_selected');
+    var teamB_opt = document.getElementById('teamB_selected');
+
+    var teamA = teamA_opt[teamA_opt.selectedIndex].value;
+    var teamB = teamB_opt[teamB_opt.selectedIndex].value;
+    var game_date = $('.form_datetime').data('datetimepicker').getDate();
+    var formatted = game_date.getFullYear().toString() + (game_date.getMonth()+1).toString() + game_date.getDate().toString()+game_date.getHours().toString() + game_date.getMinutes().toString();
+    var tokenAmount = document.getElementById('create_token_amount').value;
+
+    console.log(teamA);
+    console.log(teamB);
+    console.log(game_date);
+    console.log(formatted);
+    console.log(tokenAmount);
+  }
+
+
+  </script>
+  
+
+
+
   </pingendo>
 </body>
 
