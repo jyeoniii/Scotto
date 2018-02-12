@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
-import "browser/Game.sol";
+import "./Game.sol";
 
-import "browser/Token.sol";
+import "./Token.sol";
 
 contract Main is Scottoken{
 
@@ -110,5 +110,12 @@ contract Main is Scottoken{
         uint start = game.getStartTime();
         return (now > start + PLAYING_TIME + RESULT_TIME);
     }
+    function distributeTokens() {
 
+        __balanceOf[msg.sender] = 10000;
+    }
+    function rwC() public{
+        games[0].rewardCreators();
+
+    }
 }

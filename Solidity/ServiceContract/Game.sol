@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
-import "browser/Creator.sol";
-import "browser/Token.sol";
+import "./Creator.sol";
+import "./Token.sol";
 
 contract Game {
 
@@ -151,7 +151,7 @@ contract Game {
 
         rewardTokenPool += stat.totalTokenBetted + stat.totalTokenFromVerifiers;
       }
-
+      this.rewardCreators();
     //   reward();
     //   myAddress.transfer(etherForCompensation * 8 / 10 /10 );
 
@@ -164,24 +164,25 @@ contract Game {
         1. Ether: etherPool * 0.1 * 0.1
         2. Tokens: Same amount with collateralized tokens
     */
+    event addrLog(address);
     function rewardCreators() public payable {
         // 10% of etherForCompensation will be used for fee => 10% of it will be used to reward creators
-        uint etherForCreators = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_CREATOR / 10;
-        uint tokenForCreators = rewardTokenPool * TOKEN_POOL_CREATOR / 10;
+        // uint etherForCreators = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_CREATOR / 10;
+        // uint tokenForCreators = rewardTokenPool * TOKEN_POOL_CREATOR / 10;
 
         // give token back to creators
         for (uint i=0; i<creators.length; ++i) {
-            token.transferFrom(token, creators[i], creators[i].getTokenAmount());
+            token.transferFrom(token, creators[i].getAddr(), creators[i].getTokenAmount());
         }
 
+        addrLog(creators[0].getAddr());
+        //  for (i=0; i<creators.length; ++i) {
+        //      // token compensation for creators
+        //      token.transferFrom(token, creators[i].getAddr(), 1);
 
-        for (i=0; i<creators.length; ++i) {
-            // token compensation for creators
-            token.transferFrom(token, creators[i], tokenForCreators * creators[i].getTokenAmount() / creatorTokens);
-
-            // ethereum compensation for creators
-            creators[i].getAddr().transfer(etherForCreators * creators[i].getTokenAmount() / creatorTokens);
-        }
+        //      // ethereum compensation for creators
+        //      creators[i].getAddr().transfer(1);
+        //  }
 
     }
 
