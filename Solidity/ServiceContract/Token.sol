@@ -22,7 +22,7 @@ contract Scottoken is ERC20 {
     mapping (address => mapping (address => uint)) private __allowances;
 
     function Scottoken() public {
-            __balanceOf[msg.sender] = __totalSupply;
+        __balanceOf[msg.sender] = __totalSupply;
     }
 
     function totalSupply() public view returns (uint _totalSupply) {
@@ -34,26 +34,22 @@ contract Scottoken is ERC20 {
     }
 
     function transfer(address _to, uint _value) public returns (bool success) {
-        if (_value > 0 && _value <= balanceOf(msg.sender)) {
-            __balanceOf[msg.sender] -= _value;
-            __balanceOf[_to] += _value;
-            return true;
-        }
-        return false;
+        require(_value > 0 && _value <= balanceOf(msg.sender));
+        __balanceOf[msg.sender] -= _value;
+        __balanceOf[_to] += _value;
+        return true;
     }
 
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        if (__allowances[_from][msg.sender] > 0 &&
-            _value > 0 &&
-            __allowances[_from][msg.sender] >= _value &&
-            __balanceOf[_from] >= _value) {
-            __balanceOf[_from] -= _value;
-            __balanceOf[_to] += _value;
-            // Missed from the video
-            __allowances[_from][msg.sender] -= _value;
-            return true;
-        }
-        return false;
+        require(__allowances[_from][msg.sender] > 0 &&
+                _value > 0 &&
+                __allowances[_from][msg.sender] >= _value &&
+                __balanceOf[_from] >= _value);
+        __balanceOf[_from] -= _value;
+        __balanceOf[_to] += _value;
+        // Missed from the video
+        __allowances[_from][msg.sender] -= _value;
+        return true;
     }
 
     function approve(address _spender, uint _value) public returns (bool success) {
@@ -63,5 +59,14 @@ contract Scottoken is ERC20 {
 
     function allowance(address _owner, address _spender) public view returns (uint remaining) {
         return __allowances[_owner][_spender];
+    }
+
+    // For Java VM testing purpose
+    function distributeTokens() {
+        __balanceOf[0xca35b7d915458ef540ade6068dfe2f44e8fa733c] = 100000;
+        __balanceOf[0x14723a09acff6d2a60dcdf7aa4aff308fddc160c] = 100000;
+        __balanceOf[0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db] = 100000;
+        __balanceOf[0x583031d1113ad414f02576bd6afabfb302140225] = 100000;
+        __balanceOf[0xdd870fa1b7c4700f2bd7f44238821c26f7392148] = 100000;
     }
 }

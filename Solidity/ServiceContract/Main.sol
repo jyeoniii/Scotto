@@ -5,11 +5,17 @@ import "browser/Token.sol";
 
 contract Main is Scottoken{
 
+    event MainBalanceLog(uint etherAmount, uint tokenAmount);
+
+    modifier logging(){
+        _;
+        MainBalanceLog(this.balance, balanceOf(this));
+    }
+
     struct tempGame {
         Creator[] creators;
         uint totalToken;
     }
-
 
     //constant
     uint private constant MIN_CREATORS = 20;
@@ -47,37 +53,39 @@ contract Main is Scottoken{
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
         }
 
-
         return games;
     }
 
-    function betGame(uint _id, uint tokenAmount, uint8 result) public payable {
+    function betGame(uint _id, uint tokenAmount, uint8 result) public logging payable {
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
         require(result>= 0 && result <= 2);
         // require(isBettingTime(game));
 
         Game game = games[_id];
-        game.addBettingInfo(new Participant(msg.sender, msg.value, tokenAmount, result));
+        game.addBettingInfo(msg.sender, msg.value, tokenAmount, result);
+        game.transfer(msg.value);
 
         //token transfer process
         __balanceOf[msg.sender] -= tokenAmount;
         __balanceOf[this] += tokenAmount;
 
         this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
-
     }
 
 
-    function enterResult(uint _id, uint tokenAmount, uint8 result) public {
-       // require(isResultTime(game));
-       Game game = games[_id];
-       game.enterResult(new Verifier(msg.sender, tokenAmount, result));
+    function enterResult(uint _id, uint tokenAmount, uint8 result) logging public {
+        // require(isResultTime(game));
+        Game game = games[_id];
+        game.enterResult(msg.sender, tokenAmount, result);
+
+       __balanceOf[msg.sender] -= tokenAmount;
+       __balanceOf[this] += tokenAmount;
 
        this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
     }
 
 
-    function checkResult(uint _id) public { // when user triggers event after the result has been decided
+    function checkResult(uint _id) logging public { // when user triggers event after the result has been decided
         Game game = games[_id];
         // require(isRewardingTime(game));
         game.finalize();
@@ -102,7 +110,5 @@ contract Main is Scottoken{
         uint start = game.getStartTime();
         return (now > start + PLAYING_TIME + RESULT_TIME);
     }
-
-
 
 }

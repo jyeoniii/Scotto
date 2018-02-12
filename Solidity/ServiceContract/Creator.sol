@@ -1,11 +1,21 @@
 pragma solidity ^0.4.11;
-import "browser/People.sol";
 
-contract Creator is People{
+contract Creator {
+
+    address addr;
+    uint tokenAmount;
 
     function Creator (address _addr, uint _tokenAmount) public {
         addr = _addr;
         tokenAmount = _tokenAmount;
+    }
+
+    function getAddr() public view returns (address) {
+      return addr;
+    }
+
+    function getTokenAmount()public view returns (uint){
+      return tokenAmount;
     }
 
 
