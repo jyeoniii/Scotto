@@ -53,7 +53,7 @@ contract Main is Scottoken{
         __balanceOf[this] += tokenAmount;
 
         // Create game if condition is met
-        if (tmpGame.creators.length >= 1 ) {
+        if (tmpGame.creators.length >= 2 ) {
             Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract

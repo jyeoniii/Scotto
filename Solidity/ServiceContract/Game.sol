@@ -137,7 +137,7 @@ contract Game {
          stat = resultStat[winIdx];
          winnerEtherAmount += stat.totalEtherBetted;
          winnerTokenAmount += stat.totalTokenBetted;
-         rightVerifierTokenAmount + stat.totalTokenFromVerifiers;
+         rightVerifierTokenAmount += stat.totalTokenFromVerifiers;
 
          rewardTokenPool += stat.totalTokenBetted;
       }
@@ -153,8 +153,8 @@ contract Game {
         rewardTokenPool += stat.totalTokenBetted + stat.totalTokenFromVerifiers;
       }
 
-    //   this.rewardCreators();
-    //   this.rewardParticipants();
+      this.rewardCreators();
+      this.rewardParticipants();
       this.rewardVerifier();
     //   reward();
     //   myAddress.transfer(etherForCompensation * 8 / 10 /10 );
@@ -191,8 +191,8 @@ contract Game {
 
     }
 
-    event rewardWinnerLog(uint rewardToken, uint rewardEther, uint additionalEther);
-    event rewardLoserLog(uint rewardToken);
+    event rewardWinnerLog(uint tokenAmount, uint etherAmount, uint rewardToken, uint rewardEther, uint additionalEther);
+    event rewardLoserLog(uint tokenAmount, uint rewardToken);
     function rewardParticipants() public payable {
 
         uint etherForPariticipants = etherForCompensation * (10 - ETHER_POOL_FEE) / 10;
@@ -204,7 +204,7 @@ contract Game {
 
         // Reward winners
         for(uint8 k = 0; k < finalResult.length; k++){
-          Participant [] winners = resultStat[k].participants;
+          Participant [] winners = resultStat[finalResult[k]].participants;
           for (uint i=0; i<winners.length; ++i) {
              part = winners[i];
              // Ether compensation proposional to the amount of ether betted
@@ -215,7 +215,9 @@ contract Game {
              // Token compenstation for encouraging - propositional to the amount of token betted
              token.transferFrom(token, part.addr, tokenForWinners * part.tokenAmount / winnerTokenAmount );
 
-             rewardWinnerLog(tokenForWinners * part.tokenAmount / winnerTokenAmount,
+             rewardWinnerLog(part.tokenAmount,
+                             part.etherAmount,
+                             tokenForWinners * part.tokenAmount / winnerTokenAmount,
                              ether95 * part.etherAmount / winnerEtherAmount,
                              ether5 * part.tokenAmount / winnerTokenAmount
                              );
@@ -224,20 +226,21 @@ contract Game {
 
         // Reward losers
         for( k = 0; k < loseResult.length; k++){
-           Participant [] losers = resultStat[k].participants;
+
+           Participant [] losers = resultStat[loseResult[k]].participants;
            for ( i=0; i<losers.length; ++i) {
              part = losers[i];
 
              // Token compenstation for encouraging - propositional to the amount of token betted
              token.transferFrom(token, part.addr,tokenForLosers * part.tokenAmount / loserTokenAmount );
 
-             rewardLoserLog(tokenForLosers * part.tokenAmount / loserTokenAmount);
+             rewardLoserLog(part.tokenAmount, tokenForLosers * part.tokenAmount / loserTokenAmount);
            }
         }
 
     }
 
-    event rewardVerifierLog(uint rewardToken, uint rewardEther);
+    event rewardVerifierLog(uint tokenAmount, uint rewardToken, uint rewardEther);
     function rewardVerifier() public payable {
         uint etherForVerifiers = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_VERIFIER / 10;
         uint tokenForVerifiers = rewardTokenPool * TOKEN_POOL_VERIFIER / 10;
@@ -256,13 +259,11 @@ contract Game {
                 // token compensation for verifiers
                 token.transferFrom(token, addr, tokenForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount);
 
-                rewardVerifierLog(etherForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount,
+                rewardVerifierLog(verifier.tokenAmount,
+                                  tokenForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount,
                                   etherForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount);
             }
         }
-
-
-
     }
 
     function initDistribute(uint8 result) public {
