@@ -6,10 +6,12 @@ import "./Token.sol";
 contract Main is Scottoken{
 
     event MainBalanceLog(uint etherAmount, uint tokenAmount);
+    event GameBalanceLog(uint id, uint etherAmount, uint tokenAmount);
 
-    modifier logging(){
+    modifier logging(uint id){
         _;
         MainBalanceLog(this.balance, balanceOf(this));
+        GameBalanceLog(id, games[id].balance, balanceOf(games[id]));
     }
 
     struct tempGame {
@@ -29,6 +31,10 @@ contract Main is Scottoken{
     Game[] private games;
 
     mapping (string => tempGame) private tempGames; // string: identifier of the game
+
+    function Main(){
+        distributeTokens();
+    }
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
@@ -56,7 +62,7 @@ contract Main is Scottoken{
         return games;
     }
 
-    function betGame(uint _id, uint tokenAmount, uint8 result) public logging payable {
+    function betGame(uint _id, uint tokenAmount, uint8 result) public logging(_id) payable {
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
         require(result>= 0 && result <= 2);
         // require(isBettingTime(game));
@@ -73,7 +79,7 @@ contract Main is Scottoken{
     }
 
 
-    function enterResult(uint _id, uint tokenAmount, uint8 result) logging public {
+    function enterResult(uint _id, uint tokenAmount, uint8 result) logging(_id) public {
         // require(isResultTime(game));
         Game game = games[_id];
         game.enterResult(msg.sender, tokenAmount, result);
@@ -85,7 +91,7 @@ contract Main is Scottoken{
     }
 
 
-    function checkResult(uint _id) logging public { // when user triggers event after the result has been decided
+    function checkResult(uint _id) logging(_id) public { // when user triggers event after the result has been decided
         Game game = games[_id];
         // require(isRewardingTime(game));
         game.finalize();
@@ -110,12 +116,20 @@ contract Main is Scottoken{
         uint start = game.getStartTime();
         return (now > start + PLAYING_TIME + RESULT_TIME);
     }
-    function distributeTokens() {
 
-        __balanceOf[msg.sender] = 10000;
-    }
-    function rwC() public{
-        games[0].rewardCreators();
+    event balanceLog(address addr, uint etherBalance, uint tokenBalance);
+    function logBalance(){
+        address addr1 = 0xca35b7d915458ef540ade6068dfe2f44e8fa733c;
+        address addr2 = 0x14723a09acff6d2a60dcdf7aa4aff308fddc160c;
+        address addr3 = 0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db;
+        address addr4 = 0x583031d1113ad414f02576bd6afabfb302140225;
+        address addr5 = 0xdd870fa1b7c4700f2bd7f44238821c26f7392148;
 
+        balanceLog(addr1, addr1.balance, balanceOf(addr1));
+        balanceLog(addr2, addr2.balance, balanceOf(addr2));
+        balanceLog(addr3, addr3.balance, balanceOf(addr3));
+        balanceLog(addr4, addr4.balance, balanceOf(addr4));
+        balanceLog(addr5, addr5.balance, balanceOf(addr5));
     }
+
 }

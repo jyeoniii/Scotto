@@ -9,6 +9,7 @@ contract Game {
     event bettingLog(uint result, address addr, uint etherAmount, uint tokenAmount);
     event verifyingLog(uint result, address addr, uint tokenAmount);
 
+
     struct Participant {
         address addr;
         uint etherAmount;
@@ -151,10 +152,12 @@ contract Game {
 
         rewardTokenPool += stat.totalTokenBetted + stat.totalTokenFromVerifiers;
       }
-      this.rewardCreators();
+
+    //   this.rewardCreators();
+    //   this.rewardParticipants();
+      this.rewardVerifier();
     //   reward();
     //   myAddress.transfer(etherForCompensation * 8 / 10 /10 );
-
 
     }
 
@@ -164,77 +167,99 @@ contract Game {
         1. Ether: etherPool * 0.1 * 0.1
         2. Tokens: Same amount with collateralized tokens
     */
-    event addrLog(address);
+    event rewardCreatorLog(uint baseToken, uint rewardToken, uint rewardEther);
     function rewardCreators() public payable {
         // 10% of etherForCompensation will be used for fee => 10% of it will be used to reward creators
-        // uint etherForCreators = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_CREATOR / 10;
-        // uint tokenForCreators = rewardTokenPool * TOKEN_POOL_CREATOR / 10;
+        uint etherForCreators = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_CREATOR / 10;
+        uint tokenForCreators = rewardTokenPool * TOKEN_POOL_CREATOR / 10;
 
-        // give token back to creators
+
         for (uint i=0; i<creators.length; ++i) {
+            // give token back to creators
             token.transferFrom(token, creators[i].getAddr(), creators[i].getTokenAmount());
+
+            // token compensation for creators
+            token.transferFrom(token, creators[i].getAddr(), tokenForCreators * creators[i].getTokenAmount() / creatorTokens);
+
+            // ethereum compensation for creators
+            creators[i].getAddr().transfer(etherForCreators * creators[i].getTokenAmount() / creatorTokens);
+
+            rewardCreatorLog(creators[i].getTokenAmount(),
+                             tokenForCreators * creators[i].getTokenAmount() / creatorTokens,
+                             etherForCreators * creators[i].getTokenAmount() / creatorTokens);
         }
-
-        addrLog(creators[0].getAddr());
-        //  for (i=0; i<creators.length; ++i) {
-        //      // token compensation for creators
-        //      token.transferFrom(token, creators[i].getAddr(), 1);
-
-        //      // ethereum compensation for creators
-        //      creators[i].getAddr().transfer(1);
-        //  }
 
     }
 
+    event rewardWinnerLog(uint rewardToken, uint rewardEther, uint additionalEther);
+    event rewardLoserLog(uint rewardToken);
     function rewardParticipants() public payable {
 
         uint etherForPariticipants = etherForCompensation * (10 - ETHER_POOL_FEE) / 10;
+        uint ether95 = etherForPariticipants * 95 / 100;
+        uint ether5 = etherForPariticipants * 5 / 100;
         uint tokenForWinners = rewardTokenPool * TOKEN_POOL_WINNER / 10;
         uint tokenForLosers = rewardTokenPool * TOKEN_POOL_LOSER / 10;
         Participant part;
 
         // Reward winners
-        for(uint8 k = 0; k < finalResult.length; k++)
+        for(uint8 k = 0; k < finalResult.length; k++){
           Participant [] winners = resultStat[k].participants;
           for (uint i=0; i<winners.length; ++i) {
              part = winners[i];
              // Ether compensation proposional to the amount of ether betted
-             part.addr.transfer( etherForPariticipants * 95 / 100 * part.etherAmount / winnerEtherAmount); // ether compensation
+             part.addr.transfer( ether95 * part.etherAmount / winnerEtherAmount); // ether compensation
              // Additional ether rewarding propostional to the amount of token betted
-             part.addr.transfer( etherForPariticipants * 5 / 100 * part.tokenAmount / winnerTokenAmount );
+             part.addr.transfer( ether5 * part.tokenAmount / winnerTokenAmount );
 
              // Token compenstation for encouraging - propositional to the amount of token betted
              token.transferFrom(token, part.addr, tokenForWinners * part.tokenAmount / winnerTokenAmount );
-          }
 
-         // Reward losers
-         for( k = 0; k < loseResult.length; k++)
+             rewardWinnerLog(tokenForWinners * part.tokenAmount / winnerTokenAmount,
+                             ether95 * part.etherAmount / winnerEtherAmount,
+                             ether5 * part.tokenAmount / winnerTokenAmount
+                             );
+          }
+        }
+
+        // Reward losers
+        for( k = 0; k < loseResult.length; k++){
            Participant [] losers = resultStat[k].participants;
            for ( i=0; i<losers.length; ++i) {
              part = losers[i];
 
              // Token compenstation for encouraging - propositional to the amount of token betted
              token.transferFrom(token, part.addr,tokenForLosers * part.tokenAmount / loserTokenAmount );
-          }
+
+             rewardLoserLog(tokenForLosers * part.tokenAmount / loserTokenAmount);
+           }
+        }
 
     }
 
+    event rewardVerifierLog(uint rewardToken, uint rewardEther);
     function rewardVerifier() public payable {
         uint etherForVerifiers = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_VERIFIER / 10;
         uint tokenForVerifiers = rewardTokenPool * TOKEN_POOL_VERIFIER / 10;
+        uint winnerIdx;
+        address addr;
 
-        for(uint8 i = 0 ; i < finalResult.length; i ++)
-            uint winnerIdx = finalResult[i];
+        for(uint8 i = 0 ; i < finalResult.length; i ++){
+            winnerIdx = finalResult[i];
             Verifier[] verifiers = resultStat[winnerIdx].verifiers;
             for (uint j=0; j < verifiers.length; j ++ ) {
                 Verifier verifier = verifiers[j];
-                address addr = verifier.addr;
+                addr = verifier.addr;
 
                 // ether compensation for verifiers
                 addr.transfer(etherForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount); // ether compensation
                 // token compensation for verifiers
                 token.transferFrom(token, addr, tokenForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount);
+
+                rewardVerifierLog(etherForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount,
+                                  etherForVerifiers * verifier.tokenAmount / rightVerifierTokenAmount);
             }
+        }
 
 
 

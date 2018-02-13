@@ -34,22 +34,27 @@ contract Scottoken is ERC20 {
     }
 
     function transfer(address _to, uint _value) public returns (bool success) {
-        require(_value > 0 && _value <= balanceOf(msg.sender));
-        __balanceOf[msg.sender] -= _value;
-        __balanceOf[_to] += _value;
-        return true;
+        if(_value > 0 && _value <= balanceOf(msg.sender)){
+            __balanceOf[msg.sender] -= _value;
+            __balanceOf[_to] += _value;
+            return true;
+        }
+        return false;
     }
 
+    event transferAmount(uint);
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        require(__allowances[_from][msg.sender] > 0 &&
-                _value > 0 &&
-                __allowances[_from][msg.sender] >= _value &&
-                __balanceOf[_from] >= _value);
-        __balanceOf[_from] -= _value;
-        __balanceOf[_to] += _value;
-        // Missed from the video
-        __allowances[_from][msg.sender] -= _value;
-        return true;
+        if(__allowances[_from][msg.sender] > 0 &&
+            _value > 0 &&
+            __allowances[_from][msg.sender] >= _value &&
+            __balanceOf[_from] >= _value){
+            __balanceOf[_from] -= _value;
+            __balanceOf[_to] += _value;
+            // Missed from the video
+            __allowances[_from][msg.sender] -= _value;
+            return true;
+        }
+        return false;
     }
 
     function approve(address _spender, uint _value) public returns (bool success) {
