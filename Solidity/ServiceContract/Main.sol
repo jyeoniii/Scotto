@@ -20,7 +20,7 @@ contract Main is Scottoken{
     }
 
     //constant
-    uint private constant MIN_CREATORS = 20;
+    uint private constant MIN_CREATORS = 1;
     uint private constant CREATE_START = 7 days;
     uint private constant CREATE_PERIOD = 4 days;
     uint private constant BETTING_TIME = 3 days;
@@ -29,10 +29,11 @@ contract Main is Scottoken{
 
     uint private id = 0;
     Game[] private games;
-
+    address _owner;
     mapping (string => tempGame) private tempGames; // string: identifier of the game
 
     function Main(){
+        _owner = msg.sender;
         distributeTokens();
     }
 
@@ -40,9 +41,11 @@ contract Main is Scottoken{
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
         //require(isCreatingTime(timestamp) == true);
         // require(tokenAmount >= getCirculation()); // Not Implemented yet
-        // require(tmpGame.creators.length < MIN_CREATORS);
 
         tempGame storage tmpGame = tempGames[gameInfoStr];
+        require(tmpGame.creators.length < MIN_CREATORS);
+
+
         Creator _creator = new Creator(msg.sender, tokenAmount);
 
         tmpGame.creators.push(_creator);
@@ -53,8 +56,8 @@ contract Main is Scottoken{
         __balanceOf[this] += tokenAmount;
 
         // Create game if condition is met
-        if (tmpGame.creators.length >= 2 ) {
-            Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
+        if (tmpGame.creators.length >= MIN_CREATORS ) {
+            Game game = new Game(id++, gameInfoStr, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
         }
@@ -95,7 +98,12 @@ contract Main is Scottoken{
         Game game = games[_id];
         // require(isRewardingTime(game));
         game.finalize();
+
+        if(game.balance > 0 )
+        game.settle(_owner);
+
     }
+    event uintLog(uint);
 
     /* Functions checking game status */
     function isCreatingTime(uint start) private view returns (bool){
@@ -131,5 +139,14 @@ contract Main is Scottoken{
         balanceLog(addr4, addr4.balance, balanceOf(addr4));
         balanceLog(addr5, addr5.balance, balanceOf(addr5));
     }
+
+    function getGames() view returns (Game[]) {
+        return games;
+    }
+
+    function giveToken(address addr) {
+        __balanceOf[addr] = 100000;
+    }
+
 
 }
