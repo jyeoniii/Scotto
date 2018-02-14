@@ -6,11 +6,11 @@ contract Game {
 
 
     ERC20 token;
+    bool close = false;
+
     event bettingLog(uint result, address addr, uint etherAmount, uint tokenAmount);
     event verifyingLog(uint result, address addr, uint tokenAmount);
 
-    mapping(address => uint) tokenRewardAmount;
-    mapping(address => uint) etherRewardAmount;
 
     struct Participant {
         address addr;
@@ -56,7 +56,7 @@ contract Game {
     // game Info
     uint id ; // 게임 고유 id
     uint start; // 시작 시간 timestamp
-    string gameInfoStr;
+    string gameInfoStr; // game information in string
 
     uint8[] finalResult; // 최종 게임 결과
     uint8[] loseResult; // wrong game result
@@ -129,7 +129,7 @@ contract Game {
     function finalize() public returns (uint8[]) {
       uint8 winIdx;
       uint8 loseIdx;
-      resultStatus stat;
+      resultStatus memory stat;
 
       this.maxResult(resultStat[0].totalTokenFromVerifiers, resultStat[1].totalTokenFromVerifiers, resultStat[2].totalTokenFromVerifiers);
 
@@ -160,8 +160,6 @@ contract Game {
       this.rewardCreators();
       this.rewardParticipants();
       this.rewardVerifier();
-    //   reward();
-    //   myAddress.transfer(etherForCompensation * 8 / 10 /10 );
 
     }
 
@@ -198,17 +196,19 @@ contract Game {
     event rewardWinnerLog(uint tokenAmount, uint etherAmount, uint rewardToken, uint rewardEther, uint additionalEther);
     event rewardLoserLog(uint tokenAmount, uint rewardToken);
     function rewardParticipants() public payable {
-
+        Participant memory part;
+        Participant[] memory winners;
+        Participant[] memory losers;
         uint etherForPariticipants = etherForCompensation * (10 - ETHER_POOL_FEE) / 10;
         uint ether95 = etherForPariticipants * 95 / 100;
         uint ether5 = etherForPariticipants * 5 / 100;
         uint tokenForWinners = rewardTokenPool * TOKEN_POOL_WINNER / 10;
         uint tokenForLosers = rewardTokenPool * TOKEN_POOL_LOSER / 10;
-        Participant part;
+
 
         // Reward winners
         for(uint8 k = 0; k < finalResult.length; k++){
-          Participant [] winners = resultStat[finalResult[k]].participants;
+          winners = resultStat[finalResult[k]].participants;
           for (uint i=0; i<winners.length; ++i) {
              part = winners[i];
              // Ether compensation proposional to the amount of ether betted
@@ -231,7 +231,7 @@ contract Game {
         // Reward losers
         for( k = 0; k < loseResult.length; k++){
 
-           Participant [] losers = resultStat[loseResult[k]].participants;
+           losers = resultStat[loseResult[k]].participants;
            for ( i=0; i<losers.length; ++i) {
              part = losers[i];
 
@@ -246,6 +246,9 @@ contract Game {
 
     event rewardVerifierLog(uint tokenAmount, uint rewardToken, uint rewardEther);
     function rewardVerifier() public payable {
+        Verifier[] memory verifiers;
+        Verifier memory verifier;
+
         uint etherForVerifiers = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_VERIFIER / 10;
         uint tokenForVerifiers = rewardTokenPool * TOKEN_POOL_VERIFIER / 10;
         uint winnerIdx;
@@ -253,9 +256,9 @@ contract Game {
 
         for(uint8 i = 0 ; i < finalResult.length; i ++){
             winnerIdx = finalResult[i];
-            Verifier[] verifiers = resultStat[winnerIdx].verifiers;
+            verifiers = resultStat[winnerIdx].verifiers;
             for (uint j=0; j < verifiers.length; j ++ ) {
-                Verifier verifier = verifiers[j];
+                verifier = verifiers[j];
                 addr = verifier.addr;
 
                 // ether compensation for verifiers
@@ -271,11 +274,11 @@ contract Game {
     }
 
     function initDistribute(uint8 result) public {
-        Participant part;
-        Verifier ver;
+        Participant memory part;
+        Verifier memory ver;
 
         //give token back to winners
-        Participant[] participants = resultStat[result].participants;
+        Participant[] memory participants = resultStat[result].participants;
 
         for (uint i=0; i<participants.length; ++i){
            part = participants[i];
@@ -283,7 +286,7 @@ contract Game {
         }
 
         // give token back to right verifiers
-        Verifier[] verifiers = resultStat[result].verifiers;
+        Verifier[] memory verifiers = resultStat[result].verifiers;
         for ( i = 0; i < verifiers.length; ++i){
             ver = verifiers[i];
             token.transferFrom(token, ver.addr, ver.tokenAmount);
@@ -358,24 +361,26 @@ contract Game {
 
     }
 
-    function () public payable {
-    }
-
     function settle(address _owner) public payable{
+        close = true;
         _owner.transfer(this.balance);
     }
 
     /* For frontend */
-    function getGameInfo() public view returns (uint id, string str, uint timestamp){
+    function getGameInfo() public view returns (uint, string, uint){
         return (id, gameInfoStr, start);
     }
 
-    function getBettingInfo() public view returns (uint etherA, uint tokenA,
-                                                   uint etherB, uint tokenB,
-                                                   uint etherDraw, uint tokenDraw){
+    function getBettingInfo() public view returns (uint, uint, uint, uint ,uint ,uint ){
         return (resultStat[0].totalEtherBetted, resultStat[0].totalTokenBetted,
                 resultStat[1].totalEtherBetted, resultStat[1].totalTokenBetted,
                 resultStat[2].totalEtherBetted, resultStat[2].totalTokenBetted);
     }
 
+    function isClose() public view returns (bool){
+        return close;
+    }
+
+    function () public payable {
+    }
 }

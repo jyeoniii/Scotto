@@ -32,15 +32,15 @@ contract Main is Scottoken{
     address _owner;
     mapping (string => tempGame) private tempGames; // string: identifier of the game
 
-    function Main(){
+    function Main() public {
         _owner = msg.sender;
-        distributeTokens();
+
     }
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
-        //require(isCreatingTime(timestamp) == true);
-        // require(tokenAmount >= getCirculation()); // Not Implemented yet
+        require(isCreatingTime(timestamp) == true);
+        require(tokenAmount >= this.getCirculate() * 25 / 1000); // Not Implemented yet
 
         tempGame storage tmpGame = tempGames[gameInfoStr];
         require(tmpGame.creators.length < MIN_CREATORS);
@@ -59,7 +59,6 @@ contract Main is Scottoken{
 
         if (tmpGame.creators.length >= MIN_CREATORS ) {
             Game game = new Game(id++, gameInfoStr, tmpGame.creators, tmpGame.totalToken, timestamp);
-
             games.push(game);
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
         }
@@ -70,7 +69,7 @@ contract Main is Scottoken{
     function betGame(uint _id, uint tokenAmount, uint8 result) public logging(_id) payable {
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
         require(result>= 0 && result <= 2);
-        // require(isBettingTime(game));
+        require(isBettingTime(game));
 
         Game game = games[_id];
         game.addBettingInfo(msg.sender, msg.value, tokenAmount, result);
@@ -85,7 +84,7 @@ contract Main is Scottoken{
 
 
     function enterResult(uint _id, uint tokenAmount, uint8 result) logging(_id) public {
-        // require(isResultTime(game));
+        require(isResultTime(game));
         Game game = games[_id];
         game.enterResult(msg.sender, tokenAmount, result);
 
@@ -98,14 +97,14 @@ contract Main is Scottoken{
 
     function checkResult(uint _id) logging(_id) public { // when user triggers event after the result has been decided
         Game game = games[_id];
-        // require(isRewardingTime(game));
+        require(isRewardingTime(game));
         game.finalize();
 
         if(game.balance > 0 )
-        game.settle(_owner);
+            game.settle(_owner);
 
     }
-    event uintLog(uint);
+
 
     /* Functions checking game status */
     function isCreatingTime(uint start) private view returns (bool){
@@ -142,14 +141,18 @@ contract Main is Scottoken{
         balanceLog(addr5, addr5.balance, balanceOf(addr5));
     } */
 
-    function getGames() view returns (Game[]) {
+    function getGames() public view returns (Game[]) {
         return games;
     }
 
-    function giveToken(address addr) {
-        __balanceOf[addr] = 100000;
+
+
+    function isGameClose(uint _id) public view returns (bool){
+        return games[_id].isClose();
     }
 
+
+    //test
     uint[] tokenAmount;
     function pushBalance(address[] list) public{
       for(uint i = 0; i < list.length; i++)
@@ -158,5 +161,7 @@ contract Main is Scottoken{
     function logBalance() public view returns(uint[]){
       return tokenAmount;
     }
+
+
 
 }
