@@ -14,7 +14,7 @@
 <body style="background-color:black; color:#f2f2f2">
   <nav class="navbar navbar-expand-md bg-primary navbar-dark">
     <div class="container">
-      <a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-cloud"></i><b>  Scotto</b></a>
+      <a class="navbar-brand" href="/"><i class="fa d-inline fa-lg fa-cloud"></i><b>  Scotto</b></a>
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent" aria-controls="navbar2SupportedContent" aria-expanded="false"
         aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
       <div class="collapse navbar-collapse text-center justify-content-end" id="navbar2SupportedContent">
@@ -35,32 +35,108 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1 class="text-center display-3 text-primary" id="title"></h1>
-          <label id="league"></label>
-          <p class="" id="time"></p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="py-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <img class="img-fluid d-block ml-1 mx-auto" src="https://pingendo.github.io/templates/sections/assets/iphone_features.png">
+          <h1 class="text-center">
+            <span class="display-3 text-primary" style="font-weight:bold;margin-right:10px" name="teamA"></span>
+            vs
+            <span class="display-3 text-primary" style="font-weight:bold;margin-left:10px" name="teamB"></span>
+          </h1>
+          <h3 class="text-center text-secondary" style="font-weight:bold" id="league"></h3>
+          <h6 class="text-center" id="time"></h6>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Betting -->
   <div class="py-5">
     <div class="container">
       <div class="row">
-        <div class="col-md-12">
-          <a href="#" class="btn btn-outline-primary">Button</a>
+        <div class="col-xl-9 mx-auto">
+          <div class="mb-5">
+            <div class="form-row col-md-12 mx-auto">
+              <div class="col-md-4">
+                <select class="form-control" id="result_selected">
+                  <optgroup label="Select Team">
+                    <option disabled selected hidden>Select Team</option>
+                    <option name="teamA" value="0"></option>
+                    <option name="teamB" value="1"></option>
+                    <option value="2">Draw</option>
+                  </optgroup>
+                </select>
+              </div>
+              <span class="col-md-1"></span>
+              <input class="form-control col-md-3" type="number" id="ether_amount" min="0" max="100" placeholder=" Ether Amount">
+              <span class="col-md-1"></span>
+              <input class="form-control col-md-3" type="number" id="token_amount" min="0" max="10000" placeholder=" No.tokens"><br>
+            </div>
+            <div class="form-row col-md-12 mx-auto" style="margin-top:50px">
+              <button class="col-md-6 btn btn-outline-primary" style="margin:auto" onclick="betGame()">Submit</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Enter Result -->
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-9 mx-auto">
+          <div class="mb-5">
+            <div class="form-row col-md-12 mx-auto">
+              <div class="col-md-5">
+                <select class="form-control" id="result_entered">
+                  <optgroup label="Select Team">
+                    <option disabled selected hidden>Select Team</option>
+                    <option name="teamA" value="0"></option>
+                    <option name="teamB" value="1"></option>
+                    <option value="2">Draw</option>
+                  </optgroup>
+                </select>
+              </div>
+              <span class="col-md-2"></span>
+              <input class="form-control col-md-5" type="number" id="result_token_amount" min="0" max="10000" placeholder=" No.tokens"><br>
+            </div>
+            <div class="form-row col-md-12 mx-auto" style="margin-top:50px">
+              <button class="col-md-6 btn btn-outline-primary" style="margin:auto" onclick="enterResult()">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Betting info -->
+  <div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="col-md-4" style="background-color:rgb(30,30,30);float:left;">
+            <h5 name="teamA" class="text-center" style="margin-top:10px"></h5><br><br>
+            <p id="total_ether_A">Total Ether Betted: </p>
+            <p id="total_token_A">Total Token Betted: </p>
+            <br>
+          </div>
+          <div class="col-md-4" style="background-color:rgb(40,40,40);float:left;">
+            <h5 name="DRAW" class="text-center" style="margin-top:10px">DRAW</h5><br><br>
+            <p id="total_ether_DRAW">Total Ether Betted: </p>
+            <p id="total_token_DRAW">Total Token Betted: </p>
+            <br>
+          </div>
+
+          <div class="col-md-4" style="background-color:rgb(30,30,30);float:right;">
+            <h5 name="teamB" class="text-center" style="margin-top:10px"></h5><br><br>
+            <p id="total_ether_B">Total Ether Betted: </p>
+            <p id="total_token_B">Total Token Betted: </p>
+            <br>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="py-5">
     <div class="container">
       <div class="row">
@@ -101,49 +177,121 @@
 
   var gameAddr;
   var game;
+  var gid;
+
   function init(){
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
-    var gid = document.getElementById("gid").value;
+    gid = document.getElementById("gid").value;
     console.log(gid);
 
     Toto.at(contractAddress, function(e, instance) {
+      toto = instance;
       instance.getGames(function(e,r){
-        if(e){
+        if(e) {
           console.log(e);
-        }else {
-          if (gid >= r.length) console.log("Unexisting Game");  // TODO: 404 error handling
-          let gameAddr = r[gid];
-
-          game = Game.at(gameAddr);
-          game.getGameInfo(function(e,r) {
-            let gameStr = r[1];
-            let info = gameStr.split(":");
-
-            let league = info[0];
-            let A = info[1];
-            let B = info[2];
-
-            let timestamp = r[2].toNumber();
-
-            let dt = parseTimestamp(timestamp);
-            let hour = dt.hour
-            let noon = "AM";
-
-            if (dt.hour > 12){
-              dt.hour -= 12;
-              noon = "PM";
-            }
-
-            let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
-
-            document.getElementById("title").innerHTML = `${A} : ${B}`;
-            document.getElementById("league").innerHTML = league;
-            document.getElementById("time").innerHTML = time;
-
-          });
+          return;
         }
+        if (gid >= r.length) console.log("Unexisting Game");  // TODO: 404 error handling
+        let gameAddr = r[gid];
+
+        game = Game.at(gameAddr);
+        getGameInfo();
+        getBettingInfo();
       });
+    });
+  }
+
+  function getGameInfo() {
+    game.getGameInfo(function(e,r) {
+      let gameStr = r[1];
+      let info = gameStr.split(":");
+
+      let league = info[0];
+      let A = info[1];
+      let B = info[2];
+
+      let timestamp = r[2].toNumber();
+
+      let dt = parseTimestamp(timestamp);
+      let hour = dt.hour
+      let noon = "AM";
+
+      if (dt.hour > 12){
+        dt.hour -= 12;
+        noon = "PM";
+      }
+
+      let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
+
+      let teamA_elements = document.getElementsByName("teamA");
+      let teamB_elements = document.getElementsByName("teamB");
+
+      for (var i=0; i<teamA_elements.length; ++i){
+        teamA_elements[i].innerHTML = A;
+      }
+
+      for (var i=0; i<teamB_elements.length; ++i){
+        teamB_elements[i].innerHTML = B;
+      }
+
+      document.getElementById("league").innerHTML = league;
+      document.getElementById("time").innerHTML = time;
+
+    });
+  }
+
+  function getBettingInfo() {
+    game.getBettingInfo(function(e,r){
+      if(e) {
+        console.log(e);
+        return;
+      }
+      document.getElementById("total_ether_A").innerHTML += web3.fromWei(r[0].toNumber(), 'ether') + ' ETH';
+      document.getElementById("total_token_A").innerHTML += r[1].toNumber() + ' SCT';
+
+      document.getElementById("total_ether_B").innerHTML += web3.fromWei(r[2].toNumber(), 'ether') + ' ETH';
+      document.getElementById("total_token_B").innerHTML += r[3].toNumber() + ' SCT';
+
+      document.getElementById("total_ether_DRAW").innerHTML += web3.fromWei(r[4].toNumber(), 'ether') + ' ETH';
+      document.getElementById("total_token_DRAW").innerHTML += r[5].toNumber() + ' SCT';
+
+    });
+  }
+
+  function betGame() {
+    var result_opt = document.getElementById('result_selected');
+    var result = parseInt(result_opt[result_opt.selectedIndex].value);
+
+    var etherAmount = document.getElementById('ether_amount').value;
+    var tokenAmount = parseInt(document.getElementById('token_amount').value);
+
+    console.log(result);
+    console.log(etherAmount);
+    console.log(tokenAmount);
+
+    toto.betGame(gid, tokenAmount, result, {value:web3.toWei(etherAmount, 'ether')}, function(e,r){
+      if (e){
+        console.log(e);
+        return;
+      }
+    });
+  }
+
+  function enterResult() {
+    var result_opt = document.getElementById('result_entered');
+    var result = parseInt(result_opt[result_opt.selectedIndex].value);
+
+    var tokenAmount = parseInt(document.getElementById('result_token_amount').value);
+
+    console.log(result);
+    console.log(tokenAmount);
+
+    toto.enterResult(gid, tokenAmount, result, function(e,r) {
+      if (e) {
+        console.log(e);
+        return;
+      }
     });
   }
 
