@@ -128,7 +128,7 @@ contract Main is Scottoken{
     }
 
     event balanceLog(address addr, uint etherBalance, uint tokenBalance);
-    function logBalance(){
+    /* function logBalance(){
         address addr1 = 0xca35b7d915458ef540ade6068dfe2f44e8fa733c;
         address addr2 = 0x14723a09acff6d2a60dcdf7aa4aff308fddc160c;
         address addr3 = 0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db;
@@ -140,7 +140,7 @@ contract Main is Scottoken{
         balanceLog(addr3, addr3.balance, balanceOf(addr3));
         balanceLog(addr4, addr4.balance, balanceOf(addr4));
         balanceLog(addr5, addr5.balance, balanceOf(addr5));
-    }
+    } */
 
     function getGames() view returns (Game[]) {
         return games;
@@ -150,5 +150,13 @@ contract Main is Scottoken{
         __balanceOf[addr] = 100000;
     }
 
+    uint[] tokenAmount;
+    function pushBalance(address[] list) public{
+      for(uint i = 0; i < list.length; i++)
+      tokenAmount.push(balanceOf(list[i]));
+    }
+    function logBalance() public view returns(uint[]){
+      return tokenAmount;
+    }
 
 }
