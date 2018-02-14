@@ -108,8 +108,10 @@
             <thead>
               <tr>
                 <th>id</th>
+                <th>League</th>
                 <th>Game</th>
                 <th>Time</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody id="game_table">
@@ -119,6 +121,37 @@
       </div>
     </div>
   </div>
+
+  <!-- Pagination -->
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Previous"> <span aria-hidden="true">«</span> <span class="sr-only">Previous</span> </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">2</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">3</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">4</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Next"> <span aria-hidden="true">»</span> <span class="sr-only">Next</span> </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="py-5 text-center" style="color:white">
     <div class="container">
       <div class="row">
@@ -227,6 +260,7 @@
       </div>
     </div>
   </div>
+
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -240,11 +274,11 @@
   <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
 
-  <script type="text/javascript" src='{% static "home/util/timestamp.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "util/timestamp.js" %}' charset="UTF-8"></script>
 
   <!-- TODO: DELETE IT - testing purpose -->
-  <script type="text/javascript" src='{% static "home/abi/MainABI.js" %}'></script>
-  <script type="text/javascript" src='{% static "home/abi/GameABI.js" %}'></script>
+  <script type="text/javascript" src='{% static "abi/MainABI.js" %}'></script>
+  <script type="text/javascript" src='{% static "abi/GameABI.js" %}'></script>
 
   <script>
   // Script related to web3
@@ -284,8 +318,36 @@
 
           for (var i=0; i<games.length; ++i){
             games[i].getGameInfo(function(e,r) {
+              console.log(r);
+              let id = r[0].toNumber();
+
+              let gameStr = r[1];
+              let info = gameStr.split(":");
+
+              let league = info[0];
+              let A = info[1];
+              let B = info[2];
+              let timestamp = r[2].toNumber();
+
+              let dt = parseTimestamp(timestamp);
+              let hour = dt.hour
+              let noon = "AM";
+
+              if (dt.hour > 12){
+                dt.hour -= 12;
+                noon = "PM";
+              }
+
+              let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
+
               document.getElementById("game_table").innerHTML +=
-                "<tr><td>"+r[0].toNumber()+"</td><td>"+r[1]+"</td><td>"+r[2].toNumber()+"</td></tr>"
+                `<tr>
+                  <td>${id}</td>
+                  <td>${league}</td>
+                  <td style="font-weight:bold"><a href='game/${id}'>${A} : ${B}</a></td>
+                  <td>${time}</td>
+                  <td><label class="label" style="background-color: #28a745; color:white">OPEN</label></td>
+                </tr>`;
             });
           }
         }
@@ -349,6 +411,15 @@
   </script>
 
   </pingendo>
+
+  <style>
+    label {
+      border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
+      padding-right: 0.6em;
+      padding-bottom: 0.3em;
+      padding-left: 0.6em;
+    }
+  </style>
 </body>
 
 </html>

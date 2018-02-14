@@ -5,11 +5,15 @@ var gameAbi = [
 		"name": "getGameInfo",
 		"outputs": [
 			{
-				"name": "str",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
 				"type": "string"
 			},
 			{
-				"name": "timestamp",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -25,6 +29,20 @@ var gameAbi = [
 			{
 				"name": "",
 				"type": "uint8[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "getId",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
