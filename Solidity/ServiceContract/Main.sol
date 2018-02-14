@@ -54,7 +54,7 @@ contract Main is Scottoken{
 
         // Create game if condition is met
         if (tmpGame.creators.length >= 2 ) {
-            Game game = new Game(id++, tmpGame.creators, tmpGame.totalToken, timestamp);
+            Game game = new Game(id++, gameInfoStr, tmpGame.creators, tmpGame.totalToken, timestamp);
             games.push(game);
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
         }
@@ -130,6 +130,14 @@ contract Main is Scottoken{
         balanceLog(addr3, addr3.balance, balanceOf(addr3));
         balanceLog(addr4, addr4.balance, balanceOf(addr4));
         balanceLog(addr5, addr5.balance, balanceOf(addr5));
+    }
+
+    function getGames() view returns (Game[]) {
+        return games;
+    }
+
+    function giveToken(address addr) {
+        __balanceOf[addr] = 100000;
     }
 
 }

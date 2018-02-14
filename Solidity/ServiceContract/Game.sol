@@ -54,6 +54,7 @@ contract Game {
     // game Info
     uint id ; // 게임 고유 id
     uint start; // 시작 시간 timestamp
+    string gameInfoStr;
 
     uint8[] finalResult; // 최종 게임 결과
     uint8[] loseResult; // wrong game result
@@ -75,8 +76,9 @@ contract Game {
     uint rewardTokenPool = 0;         // Tokens from every participants & wrong verifier
 
 
-    function Game(uint _id, Creator[] _creators, uint _creatorTokens, uint timestamp) public {
+    function Game(uint _id, string _gameInfoStr, Creator[] _creators, uint _creatorTokens, uint timestamp) public {
         id = _id;
+        gameInfoStr = _gameInfoStr;
         creators = _creators;
         start = timestamp;
         creatorTokens = _creatorTokens;
@@ -357,8 +359,17 @@ contract Game {
     function () public payable {
     }
 
-    function getGameEtherBalance() returns (uint) {
-        return this.balance;
+    /* For frontend */
+    function getGameInfo() public view returns (uint id, string str, uint timestamp){
+        return (id, gameInfoStr, start);
+    }
+
+    function getBettingInfo() public view returns (uint etherA, uint tokenA,
+                                                   uint etherB, uint tokenB,
+                                                   uint etherDraw, uint tokenDraw){
+        return (resultStat[0].totalEtherBetted, resultStat[0].totalTokenBetted,
+                resultStat[1].totalEtherBetted, resultStat[1].totalTokenBetted,
+                resultStat[2].totalEtherBetted, resultStat[2].totalTokenBetted);
     }
 
 }

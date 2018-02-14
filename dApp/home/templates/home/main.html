@@ -46,8 +46,19 @@
         <div class="col-xl-9 mx-auto">
             <form class="mb-5">
               <div class="form-row col-md-12 mx-auto">
+                <!-- League -->
+                 <div class="col-md-2">
+                   <select class="form-control" id="league_selected">
+                     <optgroup label="league">
+                       <option disabled selected hidden>League</option>
+                       <option>World Cup</option>
+                       <option>EPL</option>
+                     </optgroup>
+                   </select>
+                 </div>
+
                 <!-- TeamA -->
-                 <div class="col-md-3">
+                 <div class="col-md-2">
                    <select class="form-control" id="teamA_selected">
                      <optgroup label="TeamA">
                        <option disabled selected hidden>Team</option>
@@ -59,7 +70,7 @@
                  </div>
 
                  <!-- TeamB -->
-                 <div class="col-md-3">
+                 <div class="col-md-2">
                    <select class="form-control" id="teamB_selected">
                      <optgroup label="TeamB">
                        <option disabled selected hidden>Team</option>
@@ -96,27 +107,12 @@
           <table class="table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>First Name</th>
-                <th>Last Name</th>
+                <th>id</th>
+                <th>Game</th>
+                <th>Time</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Mark</td>
-                <td>Otto</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Jacob</td>
-                <td>Thornton</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Larry</td>
-                <td>the Bird</td>
-              </tr>
+            <tbody id="game_table">
             </tbody>
           </table>
         </div>
@@ -243,6 +239,9 @@
   <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
   <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
+
+  <script type="text/javascript" src='{% static "home/util/timestamp.js" %}' charset="UTF-8"></script>
+
   <!-- TODO: DELETE IT - testing purpose -->
   <script type="text/javascript" src='{% static "home/abi/MainABI.js" %}'></script>
   <script type="text/javascript" src='{% static "home/abi/GameABI.js" %}'></script>
@@ -270,26 +269,27 @@
     Game = web3.eth.contract(gameAbi);
 
     Toto.at(contractAddress, function(e, instance) {
+      toto = instance;
       instance.getGames(function(e,r){
         if(e){
           console.log(e);
         }else {
-          console.log(r);
           if (r.length == 0) return;
           games = r;
+          console.log(r);
+
           for (var i=0; i<games.length; ++i){
             games[i] = Game.at(games[i]);
           }
-          games[0].getGameInfo(function(e,r) {
-            console.log(r[0]);
-            console.log(r[1].toNumber());
-          });
-          games[0].getBettingInfo(function(e,r) {
-            console.log(r);
-          })
+
+          for (var i=0; i<games.length; ++i){
+            games[i].getGameInfo(function(e,r) {
+              document.getElementById("game_table").innerHTML +=
+                "<tr><td>"+r[0].toNumber()+"</td><td>"+r[1]+"</td><td>"+r[2].toNumber()+"</td></tr>"
+            });
+          }
         }
       });
-      toto = instance;
     });
   }
 
@@ -320,19 +320,29 @@
 
     // Select Teams
     function createGame() {
+      var league_opt = document.getElementById('league_selected');
       var teamA_opt = document.getElementById('teamA_selected');
       var teamB_opt = document.getElementById('teamB_selected');
 
+      var league = league_opt[league_opt.selectedIndex].value;
       var teamA = teamA_opt[teamA_opt.selectedIndex].value;
       var teamB = teamB_opt[teamB_opt.selectedIndex].value;
-      var game_date = $('.form_datetime').data('datetimepicker').getDate();
-      var formatted = game_date.getFullYear().toString() + (game_date.getMonth()+1).toString() + game_date.getDate().toString()+game_date.getHours().toString() + game_date.getMinutes().toString();
+
       var tokenAmount = document.getElementById('create_token_amount').value;
 
+      var game_date = $('.form_datetime').data('datetimepicker').getDate();
+      var timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
+
+      var gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
+
+      if (toto != undefined) {
+        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){});
+      }
       console.log(teamA);
       console.log(teamB);
+      console.log(gameInfoStr);
       console.log(game_date);
-      console.log(formatted);
+      console.log(timestamp);
       console.log(tokenAmount);
     }
 
