@@ -145,12 +145,9 @@ contract Main is Scottoken{
         return games;
     }
 
-
-
     function isGameClose(uint _id) public view returns (bool){
         return games[_id].isClose();
     }
-
 
     //test
     uint[] tokenAmount;
@@ -158,8 +155,13 @@ contract Main is Scottoken{
       for(uint i = 0; i < list.length; i++)
       tokenAmount.push(balanceOf(list[i]));
     }
+
     function logBalance() public view returns(uint[]){
       return tokenAmount;
+    }
+
+    function getGames() view returns (Game[]) {
+        return games;
     }
 
 

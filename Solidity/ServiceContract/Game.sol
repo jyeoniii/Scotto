@@ -371,7 +371,9 @@ contract Game {
         return (id, gameInfoStr, start);
     }
 
-    function getBettingInfo() public view returns (uint, uint, uint, uint ,uint ,uint ){
+    function getBettingInfo() public view returns (uint etherA, uint tokenA,
+                                                   uint etherB, uint tokenB,
+                                                   uint etherDraw, uint tokenDraw){
         return (resultStat[0].totalEtherBetted, resultStat[0].totalTokenBetted,
                 resultStat[1].totalEtherBetted, resultStat[1].totalTokenBetted,
                 resultStat[2].totalEtherBetted, resultStat[2].totalTokenBetted);

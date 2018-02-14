@@ -1,0 +1,424 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Scotto!</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="https://v40.pingendo.com/assets/4.0.0/default/theme.css" type="text/css"> </head>
+
+  <!-- Style for Datetime picker -->
+  <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
+
+
+<body style="background-color:black; color:#f2f2f2">
+  <!-- Nav bar -->
+  <nav class="navbar navbar-expand-md bg-primary navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-cloud"></i><b>  Scotto</b></a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent" aria-controls="navbar2SupportedContent" aria-expanded="false"
+        aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+      <div class="collapse navbar-collapse text-center justify-content-end" id="navbar2SupportedContent">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fa d-inline fa-lg fa-bookmark-o"></i> Bookmarks</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="fa d-inline fa-lg fa-envelope-o"></i> Contacts</a>
+          </li>
+        </ul>
+        <a class="btn navbar-btn ml-2 text-white btn-secondary" id="accountAddr"><i class="fa d-inline fa-lg fa-user-circle-o"></i> </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <div class="py-5 text-center h-100" style="background-image: url(&quot;http://www.hdwallpaperup.com/wp-content/uploads/2015/07/Soccer-Beautiful-High-Quality-Wallpaper-1440x900.jpg&quot;);">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="display-3 mb-4 text-primary">Scotto</h1>
+          <h3 class="lead mb-5"> Predict the result of soccer games<br>based on Etherum Smart Contract!</h3>
+        </div>
+
+        <div class="col-xl-9 mx-auto">
+            <form class="mb-5">
+              <div class="form-row col-md-12 mx-auto">
+                <!-- League -->
+                 <div class="col-md-2">
+                   <select class="form-control" id="league_selected">
+                     <optgroup label="League">
+                       <option disabled selected hidden>League</option>
+                       <option>World Cup</option>
+                       <option>EPL</option>
+                     </optgroup>
+                   </select>
+                 </div>
+
+                <!-- TeamA -->
+                 <div class="col-md-2">
+                   <select class="form-control" id="teamA_selected">
+                     <optgroup label="TeamA">
+                       <option disabled selected hidden>Team</option>
+                       <option>South Korea</option>
+                       <option>Japan</option>
+                       <option>Taiwan</option>
+                     </optgroup>
+                   </select>
+                 </div>
+
+                 <!-- TeamB -->
+                 <div class="col-md-2">
+                   <select class="form-control" id="teamB_selected">
+                     <optgroup label="TeamB">
+                       <option disabled selected hidden>Team</option>
+                       <option>Spain</option>
+                       <option>France</option>
+                       <option>Sweden</option>
+                     </optgroup>
+                   </select>
+                 </div>
+
+                 <!-- Datetime picker-->
+                 <div class="input-group date form_datetime col-md-4" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                    <input class="form-control" size="16" type="text" value="" readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+					          <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                 </div>
+				         <input type="hidden" id="dtp_input1" value="" /><br/>
+           </form>
+           <!-- Token Amount -->
+           <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="No.tokens">
+          </div>
+          <button class="col-md-6 btn btn-lg btn-secondary" onclick="createGame()">Submit</button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>League</th>
+                <th>Game</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="game_table">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="pagination">
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Previous"> <span aria-hidden="true">«</span> <span class="sr-only">Previous</span> </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">2</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">3</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#">4</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#" aria-label="Next"> <span aria-hidden="true">»</span> <span class="sr-only">Next</span> </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="py-5 text-center" style="color:white">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Testimonials columns</h1>
+          <p class="lead">We grow together with the community</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 p-4">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_meow.jpg">
+          <p class="my-4"><i>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</i></p>
+          <p><b>Meow</b>
+            <br>Senior developer</p>
+        </div>
+        <div class="col-md-4 p-4">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_fish.jpg">
+          <p class="my-4"><i>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec. </i></p>
+          <p><b>J. L. Fish</b>
+            <br>UI designer</p>
+        </div>
+        <div class="col-md-4 p-4">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
+          <p class="my-4"><i>Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Cum sociis natoque penatibus et magnis dis parturient montes.</i></p>
+          <p><b>Carlito</b>
+            <br>Boss</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="mb-4 text-primary">Benefits and features</h1>
+          <p class="lead">Design unique interfaces by customizing Bootstrap theme with Pingendo.
+            <br>Modify colors, fonts and grid setting without opening any CSS file.</p>
+          <div class="row text-left mt-5">
+            <div class="col-md-4 my-3">
+              <div class="row mb-3">
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-mars"></i></div>
+                <div class="align-self-center col-10">
+                  <h5 class="text-secondary"><b>For him</b></h5>
+                </div>
+              </div>
+              <p>Based on fluid design principles. Works with screen resolution. &nbsp;In-app chat panel 24/7 active. The support you need, right there.</p>
+            </div>
+            <div class="col-md-4 my-3">
+              <div class="row mb-3">
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-venus"></i></div>
+                <div class="align-self-center col-10">
+                  <h5 class="text-secondary"><b>For her</b></h5>
+                </div>
+              </div>
+              <p>Help us spreading the word. Tell your friends with just one-click.&nbsp;Work simultaneously on different panels with the switcher</p>
+            </div>
+            <div class="col-md-4 my-3">
+              <div class="row mb-3">
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-neuter"></i></div>
+                <div class="align-self-center col-10">
+                  <h5 class="text-secondary"><b>For its</b></h5>
+                </div>
+              </div>
+              <p>You are working with plain HTML and SASS files on your computer, so extending and integrating Javascript is a breeze.</p>
+            </div>
+            <div class="col-md-4 my-3">
+              <div class="row mb-3">
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-mars-stroke"></i></div>
+                <div class="align-self-center col-10">
+                  <h5 class="text-secondary"><b>For anyone</b></h5>
+                </div>
+              </div>
+              <p>Based on fluid design principles. Works with screen resolution.&nbsp;Choose settings depending on the criteria you value the most.</p>
+            </div>
+            <div class="col-md-4 my-3">
+              <div class="row mb-3">
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-mars-double"></i></div>
+                <div class="align-self-center col-10">
+                  <h5 class="text-secondary"><b>Even couples</b></h5>
+                </div>
+              </div>
+              <p>In-app chat panel 24/7 active. The support you need, right there. Pingendo enhance the battery duration and the quality of your life.&nbsp;</p>
+            </div>
+            <div class="col-md-4 my-3">
+              <div class="row mb-3">
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-genderless"></i></div>
+                <div class="align-self-center col-10">
+                  <h5 class="text-secondary"><b>Any other?</b></h5>
+                </div>
+              </div>
+              <p>Help us spreading the word. Tell your friends with just one-click.&nbsp;Work simultaneously on different panels. Share the work with teammates.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5 text-white" style="background-image: url(&quot;https://pingendo.github.io/templates/sections/assets/test_lily.jpg&quot;);">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <p class="lead"><i>"I have been using Pingendo since a while. There's no way I can leave it now or never. And many people are doing the same, and I seriously do not understand who isn't."</i>
+            <br> </p>
+          <p class="lead m-0"><b>Lily Jonhansen - Times</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
+    <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
+
+
+  <!-- Datetime picker -->
+  <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
+
+  <script type="text/javascript" src='{% static "util/timestamp.js" %}' charset="UTF-8"></script>
+
+  <!-- TODO: DELETE IT - testing purpose -->
+  <script type="text/javascript" src='{% static "abi/MainABI.js" %}'></script>
+  <script type="text/javascript" src='{% static "abi/GameABI.js" %}'></script>
+
+  <script>
+  // Script related to web3
+
+  window.addEventListener('load', function() {
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== 'undefined') {
+      // Use Mist/MetaMask's provider
+      window.web3 = new Web3(web3.currentProvider);
+    } else {
+      console.log('No web3? You should consider trying MetaMask!')
+      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+      window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    }
+    // Now you can start your app & access web3 freely:
+    init();
+  });
+
+  var games;
+  function init(){
+    Toto = web3.eth.contract(mainAbi);
+    Game = web3.eth.contract(gameAbi);
+
+    Toto.at(contractAddress, function(e, instance) {
+      toto = instance;
+      instance.getGames(function(e,r){
+        if(e){
+          console.log(e);
+        }else {
+          if (r.length == 0) return;
+          games = r;
+          console.log(r);
+
+          for (var i=0; i<games.length; ++i){
+            games[i] = Game.at(games[i]);
+          }
+
+          for (var i=0; i<games.length; ++i){
+            games[i].getGameInfo(function(e,r) {
+              console.log(r);
+              let id = r[0].toNumber();
+
+              let gameStr = r[1];
+              let info = gameStr.split(":");
+
+              let league = info[0];
+              let A = info[1];
+              let B = info[2];
+              let timestamp = r[2].toNumber();
+
+              let dt = parseTimestamp(timestamp);
+              let hour = dt.hour
+              let noon = "AM";
+
+              if (dt.hour > 12){
+                dt.hour -= 12;
+                noon = "PM";
+              }
+
+              let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
+
+              document.getElementById("game_table").innerHTML +=
+                `<tr>
+                  <td>${id}</td>
+                  <td>${league}</td>
+                  <td style="font-weight:bold"><a href='game/${id}'>${A} : ${B}</a></td>
+                  <td>${time}</td>
+                  <td><label class="label" style="background-color: #28a745; color:white">OPEN</label></td>
+                </tr>`;
+            });
+          }
+        }
+      });
+    });
+  }
+
+  web3.eth.getAccounts(function(e,r){
+    if (r.length > 0)
+      document.getElementById('accountAddr').innerHTML += r[0];
+    else
+      document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
+  });
+
+
+  </script>
+
+
+  <script type="text/javascript">
+
+    // datetimepicker
+    $('.form_datetime').datetimepicker({
+        //language:  'fr',
+    weekStart: 1,
+    todayBtn:  1,
+  	autoclose: 1,
+  	todayHighlight: 1,
+  	startView: 2,
+  	forceParse: 0,
+    showMeridian: 1
+    });
+
+    // Select Teams
+    function createGame() {
+      var league_opt = document.getElementById('league_selected');
+      var teamA_opt = document.getElementById('teamA_selected');
+      var teamB_opt = document.getElementById('teamB_selected');
+
+      var league = league_opt[league_opt.selectedIndex].value;
+      var teamA = teamA_opt[teamA_opt.selectedIndex].value;
+      var teamB = teamB_opt[teamB_opt.selectedIndex].value;
+
+      var tokenAmount = document.getElementById('create_token_amount').value;
+
+      var game_date = $('.form_datetime').data('datetimepicker').getDate();
+      var timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
+
+      var gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
+
+      if (toto != undefined) {
+        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){});
+      }
+      console.log(teamA);
+      console.log(teamB);
+      console.log(gameInfoStr);
+      console.log(game_date);
+      console.log(timestamp);
+      console.log(tokenAmount);
+    }
+
+  </script>
+
+  </pingendo>
+
+  <style>
+    label {
+      border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
+      padding-right: 0.6em;
+      padding-bottom: 0.3em;
+      padding-left: 0.6em;
+    }
+  </style>
+</body>
+
+</html>

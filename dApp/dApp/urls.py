@@ -21,5 +21,6 @@ from django.conf import settings
 urlpatterns = [
     url(r'^$', include('home.urls')),
     url(r'^home/', include('home.urls')),
+    url(r'^game/', include('game.urls')),
     url(r'^admin/', admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
