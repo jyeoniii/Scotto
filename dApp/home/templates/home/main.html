@@ -1,38 +1,12 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html>
 
-<head>
-  <title>Scotto!</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
-  <link rel="stylesheet" href="https://v40.pingendo.com/assets/4.0.0/default/theme.css" type="text/css"> </head>
-
+{% block head_content %}
   <!-- Style for Datetime picker -->
   <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
+{% endblock head_content %}
 
-
-<body style="background-color:black; color:#f2f2f2;">
-  <!-- Nav bar -->
-  <nav class="navbar navbar-expand-md bg-primary navbar-dark">
-    <div class="container">
-      <a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-cloud"></i><b>  Scotto</b></a>
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent" aria-controls="navbar2SupportedContent" aria-expanded="false"
-        aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
-      <div class="collapse navbar-collapse text-center justify-content-end" id="navbar2SupportedContent">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fa d-inline fa-lg fa-bookmark-o"></i> Bookmarks</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fa d-inline fa-lg fa-envelope-o"></i> Contacts</a>
-          </li>
-        </ul>
-        <a class="btn navbar-btn ml-2 text-white btn-secondary" id="accountAddr"><i class="fa d-inline fa-lg fa-user-circle-o"></i> </a>
-      </div>
-    </div>
-  </nav>
+{% block body_content %}
 
   <!-- Header -->
   <div class="py-5 text-center h-100" style="background-image: url(&quot;http://www.hdwallpaperup.com/wp-content/uploads/2015/07/Soccer-Beautiful-High-Quality-Wallpaper-1440x900.jpg&quot;);">
@@ -261,25 +235,19 @@
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
-    <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
+{% endblock body_content %}
 
+{% block script_content %}
+
+  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
+  <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
+  </pingendo>
 
   <!-- Datetime picker -->
   <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
   <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
-
-  <script type="text/javascript" src='{% static "util/timestamp.js" %}' charset="UTF-8"></script>
-  <script type="text/javascript" src='{% static "util/common.js" %}'></script>
-
-  <!-- TODO: DELETE IT - testing purpose -->
-  <script type="text/javascript" src='{% static "ABI/mainABI.js" %}'></script>
-  <script type="text/javascript" src='{% static "ABI/gameABI.js" %}'></script>
 
   <script>
   // Script related to web3
@@ -290,16 +258,15 @@
     Game = web3.eth.contract(gameAbi);
 
     console.log(contractAddress);
+
     Toto.at(contractAddress, function(e, instance) {
       toto = instance;
       instance.getGames(function(e,r){
         if(e){
           console.log(e);
         }else {
-          console.log(r);
           if (r.length == 0) return;
           games = r;
-          console.log(r);
 
           for (var i=0; i<games.length; ++i){
             games[i] = Game.at(games[i]);
@@ -307,7 +274,6 @@
 
           for (var i=0; i<games.length; ++i){
             games[i].getGameInfo(function(e,r) {
-              console.log(r);
               let id = r[0].toNumber();
 
               let gameStr = r[1];
@@ -333,7 +299,7 @@
                 `<tr>
                   <td>${id}</td>
                   <td>${league}</td>
-                  <td style="font-weight:bold"><a href='game/${id}'>${A} : ${B}</a></td>
+                  <td style="font-weight:bold"><a href='home/game/${id}'>${A} : ${B}</a></td>
                   <td>${time}</td>
                   <td><label class="label" style="background-color: #28a745; color:white">OPEN</label></td>
                 </tr>`;
@@ -343,7 +309,6 @@
       });
     });
   }
-
 
   </script>
 
@@ -394,16 +359,15 @@
 
   </script>
 
-  </pingendo>
+{% endblock script_content %}
 
-  <style>
-    label {
-      border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
-      padding-right: 0.6em;
-      padding-bottom: 0.3em;
-      padding-left: 0.6em;
-    }
-  </style>
-</body>
-
-</html>
+{% block style_content %}
+<style>
+  label {
+    border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
+    padding-right: 0.6em;
+    padding-bottom: 0.3em;
+    padding-left: 0.6em;
+  }
+</style>
+{% endblock style_content %}
