@@ -141,9 +141,7 @@ contract Main is Scottoken{
         balanceLog(addr5, addr5.balance, balanceOf(addr5));
     } */
 
-    function getGames() public view returns (Game[]) {
-        return games;
-    }
+
 
     function isGameClose(uint _id) public view returns (bool){
         return games[_id].isClose();
