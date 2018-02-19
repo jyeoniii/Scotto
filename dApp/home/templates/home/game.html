@@ -155,25 +155,14 @@
   <script type="text/javascript" src='{% static "util/timestamp.js" %}' charset="UTF-8"></script>
 
   <!-- TODO: DELETE IT - testing purpose -->
-  <script type="text/javascript" src='{% static "abi/MainABI.js" %}'></script>
-  <script type="text/javascript" src='{% static "abi/GameABI.js" %}'></script>
+  <script type="text/javascript" src='{% static "ABI/MainABI.js" %}'></script>
+  <script type="text/javascript" src='{% static "ABI/GameABI.js" %}'></script>
+
+  <script type="text/javascript" src='{% static "util/common.js" %}'></script>
 
   <script>
   // Script related to web3
 
-  window.addEventListener('load', function() {
-    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-    if (typeof web3 !== 'undefined') {
-      // Use Mist/MetaMask's provider
-      window.web3 = new Web3(web3.currentProvider);
-    } else {
-      console.log('No web3? You should consider trying MetaMask!')
-      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-      window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-    }
-    // Now you can start your app & access web3 freely:
-    init();
-  });
 
   var gameAddr;
   var game;
@@ -183,7 +172,8 @@
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
     gid = document.getElementById("gid").value;
-    console.log(gid);
+
+    console.log(contractAddress);
 
     Toto.at(contractAddress, function(e, instance) {
       toto = instance;
@@ -192,7 +182,7 @@
           console.log(e);
           return;
         }
-        if (gid >= r.length) console.log("Unexisting Game");  // TODO: 404 error handling
+        if (gid > r.length) console.log("Unexisting Game");  // TODO: 404 error handling
         let gameAddr = r[gid];
 
         game = Game.at(gameAddr);
@@ -294,14 +284,6 @@
       }
     });
   }
-
-  web3.eth.getAccounts(function(e,r){
-    if (r.length > 0)
-      document.getElementById('accountAddr').innerHTML += r[0];
-    else
-      document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
-  });
-
 
   </script>
 

@@ -13,7 +13,7 @@
   <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
 
 
-<body style="background-color:black; color:#f2f2f2">
+<body style="background-color:black; color:#f2f2f2;">
   <!-- Nav bar -->
   <nav class="navbar navbar-expand-md bg-primary navbar-dark">
     <div class="container">
@@ -38,9 +38,9 @@
   <div class="py-5 text-center h-100" style="background-image: url(&quot;http://www.hdwallpaperup.com/wp-content/uploads/2015/07/Soccer-Beautiful-High-Quality-Wallpaper-1440x900.jpg&quot;);">
     <div class="container py-5">
       <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12" style="font-family: Helvetica Neue">
           <h1 class="display-3 mb-4 text-primary">Scotto</h1>
-          <h3 class="lead mb-5"> Predict the result of soccer games<br>based on Etherum Smart Contract!</h3>
+          <h3 class="lead mb-5"> Predict the result of soccer games<br>based on Ethereum Smart Contract!</h3>
         </div>
 
         <div class="col-xl-9 mx-auto">
@@ -51,8 +51,9 @@
                    <select class="form-control" id="league_selected">
                      <optgroup label="League">
                        <option disabled selected hidden>League</option>
-                       <option>World Cup</option>
-                       <option>EPL</option>
+                       {% for league in leagues %}
+                        <option>{{ league.name }}</option>
+                       {% endfor %}
                      </optgroup>
                    </select>
                  </div>
@@ -274,39 +275,28 @@
   <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
 
   <script type="text/javascript" src='{% static "util/timestamp.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "util/common.js" %}'></script>
 
   <!-- TODO: DELETE IT - testing purpose -->
-  <script type="text/javascript" src='{% static "abi/MainABI.js" %}'></script>
-  <script type="text/javascript" src='{% static "abi/GameABI.js" %}'></script>
+  <script type="text/javascript" src='{% static "ABI/mainABI.js" %}'></script>
+  <script type="text/javascript" src='{% static "ABI/gameABI.js" %}'></script>
 
   <script>
   // Script related to web3
-
-  window.addEventListener('load', function() {
-    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-    if (typeof web3 !== 'undefined') {
-      // Use Mist/MetaMask's provider
-      window.web3 = new Web3(web3.currentProvider);
-    } else {
-      console.log('No web3? You should consider trying MetaMask!')
-      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-      window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-    }
-    // Now you can start your app & access web3 freely:
-    init();
-  });
 
   var games;
   function init(){
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
 
+    console.log(contractAddress);
     Toto.at(contractAddress, function(e, instance) {
       toto = instance;
       instance.getGames(function(e,r){
         if(e){
           console.log(e);
         }else {
+          console.log(r);
           if (r.length == 0) return;
           games = r;
           console.log(r);
@@ -354,13 +344,6 @@
     });
   }
 
-  web3.eth.getAccounts(function(e,r){
-    if (r.length > 0)
-      document.getElementById('accountAddr').innerHTML += r[0];
-    else
-      document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
-  });
-
 
   </script>
 
@@ -397,7 +380,9 @@
       var gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
 
       if (toto != undefined) {
-        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){});
+        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){
+          if(e) console.log(e);
+        });
       }
       console.log(teamA);
       console.log(teamB);

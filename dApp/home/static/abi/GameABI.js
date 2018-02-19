@@ -2,6 +2,20 @@ var gameAbi = [
 	{
 		"constant": true,
 		"inputs": [],
+		"name": "isClose",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
 		"name": "getGameInfo",
 		"outputs": [
 			{
@@ -37,16 +51,16 @@ var gameAbi = [
 	},
 	{
 		"constant": false,
-		"inputs": [],
-		"name": "getId",
-		"outputs": [
+		"inputs": [
 			{
-				"name": "",
-				"type": "uint256"
+				"name": "_owner",
+				"type": "address"
 			}
 		],
-		"payable": false,
-		"stateMutability": "nonpayable",
+		"name": "settle",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
