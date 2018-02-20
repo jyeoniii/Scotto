@@ -19,31 +19,29 @@
       <div class="row">
         <div class="col-md-12">
           <table class="table">
-            <thead>CREATE INFO
+            <thead><h1>CREATE INFO</h1>
               <tr>
                 <th>id</th>
-                <th>Game</th>
+
                 <th>SCT Amount</th>
-                <th>ETH Amount</th>
-                <th>Status</th>
+
               </tr>
             </thead>
-
             <tbody id="create_info">
             </tbody>
-
-
           </table>
         </div>
+
+
         <div class = "col-md-12">
           <table class="table">
-            <thead>BETTING INFO
+            <thead><h1>BET INFO</h1>
               <tr>
                 <th>id</th>
-                <th>Game</th>
-                <th>SCT Amount</th>
+                <th>result</th>
                 <th>ETH Amount</th>
-                <th>Status</th>
+                <th>SCT Amount</th>
+
               </tr>
             </thead>
 
@@ -52,16 +50,22 @@
 
           </table>
         </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="container">
+      <div class="row">
           <div class = "col-md-12">
 
           <table class="table">
-            <thead>VERIFY INFO
+            <thead><h1>VERIFY INFO</h1>
               <tr>
                 <th>id</th>
-                <th>Game</th>
+                <th>result</th>
                 <th>SCT Amount</th>
-                <th>ETH Amount</th>
-                <th>Status</th>
+
+
               </tr>
             </thead>
 
@@ -71,6 +75,9 @@
 
           </table>
         </div>
+      </div>
+
+  </div>
       </div>
     </div>
   </div>
@@ -97,110 +104,61 @@
 
   var games;
   function init(){
+
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
 
-    console.log(contractAddress);
 
     Toto.at(contractAddress, function(e, instance) {
+      if(instance){
       toto = instance;
-      instance.getGames(function(e,r){
-        if(e){
-          console.log(e);
-        }else {
-          if (r.length == 0) return;
-          games = r;
 
-          for (var i=0; i<games.length; ++i){
-            games[i] = Game.at(games[i]);
-          }
+      web3.eth.getAccounts(function(e,r){
+        if (r.length > 0){
+          instance.accountInfo(r[0],
+            function(e, r){
 
-          for (var i=0; i<games.length; ++i){
-            games[i].getGameInfo(function(e,r) {
-              let id = r[0].toNumber();
+              for(var i = 0 ; i < r[0].length; i = i + 2){
+                document.getElementById("create_info").innerHTML +=
+                  `<tr>
+                    <td>${r[0][i]}</td>
+                      <td>${r[0][i+1]}</td>
 
-              let gameStr = r[1];
-              let info = gameStr.split(":");
-
-              let league = info[0];
-              let A = info[1];
-              let B = info[2];
-              let timestamp = r[2].toNumber();
-
-              let dt = parseTimestamp(timestamp);
-              let hour = dt.hour
-              let noon = "AM";
-
-              if (dt.hour > 12){
-                dt.hour -= 12;
-                noon = "PM";
+                  </tr>`;
               }
 
-              let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
+              for(var i = 0 ; i < r[1].length; i = i + 4){
+                document.getElementById("betting_info").innerHTML +=
+                  `<tr>
+                    <td>${r[1][i]}</td>
+                      <td>${r[1][i+1]}</td>
+                      <td>${r[1][i+2]}</td>
+                        <td>${r[1][i+3]}</td>
+                  </tr>`;
+              }
+              for(var i = 0 ; i < r[2].length; i = i + 3){
+                document.getElementById("verifying_info").innerHTML +=
+                  `<tr>
+                    <td>${r[2][i]}</td>
+                      <td>${r[2][i+1]}</td>
+                      <td>${r[2][i+2]}</td>
 
-              document.getElementById("create_info").innerHTML +=
-                `<tr>
-                  <td>${id}</td>
-                  <td>${league}</td>
-                  <td style="font-weight:bold"><a href='game/${id}'>${A} : ${B}</a></td>
-                  <td>${time}</td>
-                  <td><label class="label" style="background-color: #28a745; color:white">OPEN</label></td>
-                </tr>`;
-            });
-          }
-        }
-      });
-    });
-  }
-
-  </script>
+                  </tr>`;
+              }
+            })
+        }})
 
 
-  <script type="text/javascript">
-
-    // datetimepicker
-    $('.form_datetime').datetimepicker({
-        //language:  'fr',
-    weekStart: 1,
-    todayBtn:  1,
-  	autoclose: 1,
-  	todayHighlight: 1,
-  	startView: 2,
-  	forceParse: 0,
-    showMeridian: 1
-    });
-
-    // Select Teams
-    function createGame() {
-      var league_opt = document.getElementById('league_selected');
-      var teamA_opt = document.getElementById('teamA_selected');
-      var teamB_opt = document.getElementById('teamB_selected');
-
-      var league = league_opt[league_opt.selectedIndex].value;
-      var teamA = teamA_opt[teamA_opt.selectedIndex].value;
-      var teamB = teamB_opt[teamB_opt.selectedIndex].value;
-
-      var tokenAmount = document.getElementById('create_token_amount').value;
-
-      var game_date = $('.form_datetime').data('datetimepicker').getDate();
-      var timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
-
-      var gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
-
-      if (toto != undefined) {
-        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){
-          if(e) console.log(e);
-        });
       }
-      console.log(teamA);
-      console.log(teamB);
-      console.log(gameInfoStr);
-      console.log(game_date);
-      console.log(timestamp);
-      console.log(tokenAmount);
-    }
 
+
+
+  })
+}
   </script>
+
+
+
 
 {% endblock script_content %}
 

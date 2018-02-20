@@ -13,9 +13,14 @@ window.addEventListener('load', function() {
   init();
 });
 
+
+
 web3.eth.getAccounts(function(e,r){
-  if (r.length > 0)
+  if (r.length > 0){
     document.getElementById('accountAddr').innerHTML += r[0];
+    
+
+  }
   else
     document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
 });
