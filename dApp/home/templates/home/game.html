@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block head_content %}
-  <input hidden id="gid" value={{gid}}></span>
+  <input hidden id="gid" value={{gid}}>
+  <link rel="stylesheet" href="{% static 'FlipClock-master/compiled/flipclock.css' %}">
 {% endblock head_content %}
 
 {% block body_content %}
@@ -18,6 +19,19 @@
           </h1>
           <h3 class="text-center text-secondary" style="font-weight:bold" id="league"></h3>
           <h6 class="text-center" id="time"></h6>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Counter -->
+  <div class="container">
+    <div class="row">
+      <div class="col-xl-12 mx auto">
+        <div class="mb-5">
+          <div class="form-row col-md-8 mx-auto">
+            <div class="clock"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -89,22 +103,24 @@
       <div class="row">
         <div class="col-md-12">
           <div class="col-md-4" style="background-color:rgb(30,30,30);float:left;">
-            <h5 name="teamA" class="text-center" style="margin-top:10px"></h5><br><br>
-            <p id="total_ether_A">Total Ether Betted: </p>
-            <p id="total_token_A">Total Token Betted: </p>
+            <h5 name="teamA" class="text-center" style="margin-top:10px;font-weight:bold"></h5><br><br>
+            <img src="{% static 'img/ethereum.jpg' %}" width="25"><span id="total_ether_A"> Total Ether Betted: </span><br>
+            <img src="{% static 'img/Blank_BitCoin_Logo_Graphic.png' %}" width="20"><span id="total_token_A"> Total Token Betted: </span><br>
             <br>
           </div>
           <div class="col-md-4" style="background-color:rgb(40,40,40);float:left;">
-            <h5 name="DRAW" class="text-center" style="margin-top:10px">DRAW</h5><br><br>
-            <p id="total_ether_DRAW">Total Ether Betted: </p>
-            <p id="total_token_DRAW">Total Token Betted: </p>
+            <h5 name="DRAW" class="text-center" style="margin-top:10px;font-weight:bold">DRAW</h5><br><br>
+
+            <img src="{% static 'img/ethereum.jpg' %}" width="25"><span id="total_ether_DRAW"> Total Ether Betted: </span><br>
+            <img src="{% static 'img/Blank_BitCoin_Logo_Graphic.png' %}" width="20"><span id="total_token_DRAW"> Total Token Betted: </span><br>
             <br>
           </div>
 
           <div class="col-md-4" style="background-color:rgb(30,30,30);float:right;">
-            <h5 name="teamB" class="text-center" style="margin-top:10px"></h5><br><br>
-            <p id="total_ether_B">Total Ether Betted: </p>
-            <p id="total_token_B">Total Token Betted: </p>
+            <h5 name="teamB" class="text-center" style="margin-top:10px;font-weight:bold"></h5><br><br>
+
+            <img src="{% static 'img/ethereum.jpg' %}" width="25"><span id="total_ether_B"> Total Ether Betted: </span><br>
+            <img src="{% static 'img/Blank_BitCoin_Logo_Graphic.png' %}" width="20"><span id="total_token_B"> Total Token Betted: </span><br>
             <br>
           </div>
 
@@ -128,6 +144,32 @@
 {% endblock body_content %}
 
 {% block script_content %}
+
+  <script src="{% static 'FlipClock-master/compiled/flipclock.min.js' %}"></script>
+  <script src="{% static 'FlipClock-master/compiled/flipclock.min.js' %}"></script>
+
+  <script type="text/javascript">
+		var clock;
+
+		$(document).ready(function() {
+			var clock;
+
+			clock = $('.clock').FlipClock({
+		        clockFace: 'DailyCounter',
+		        autoStart: false,
+		        callbacks: {
+		        	stop: function() {
+		        		$('.message').html('The clock has stopped!')
+		        	}
+		        }
+		    });
+
+		    clock.setTime(220880);
+		    clock.setCountdown(true);
+		    clock.start();
+
+		});
+	</script>
 
   <script>
   // Script related to web3
@@ -255,8 +297,4 @@
   }
 
   </script>
-
-  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
-    <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
-  </pingendo>
 {% endblock script_content %}
