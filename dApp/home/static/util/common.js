@@ -1,3 +1,6 @@
+var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSE"];
+var gameStatusColor = ["#28a745", "#8A2BE2",	"#FFA500", "	#DB7093", "#B22222"];
+
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -18,7 +21,7 @@ window.addEventListener('load', function() {
 web3.eth.getAccounts(function(e,r){
   if (r.length > 0){
     document.getElementById('accountAddr').innerHTML += r[0];
-    
+
 
   }
   else

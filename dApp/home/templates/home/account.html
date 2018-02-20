@@ -2,16 +2,9 @@
 {% load static %}
 
 {% block head_content %}
-  <!-- Style for Datetime picker -->
-  <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
 {% endblock head_content %}
 
 {% block body_content %}
-
-  <!-- Header -->
-  <div class="py-5 text-center h-100" style="background-image: url(&quot;http://www.hdwallpaperup.com/wp-content/uploads/2015/07/Soccer-Beautiful-High-Quality-Wallpaper-1440x900.jpg&quot;);">
-    <div class="container py-5">
-
 
   <!-- Table -->
   <div class="py-5">
@@ -19,12 +12,10 @@
       <div class="row">
         <div class="col-md-12">
           <table class="table">
-            <thead><h1>CREATE INFO</h1>
+            <thead><h1 class="text-center text-primary">CREATE INFO</h1>
               <tr>
                 <th>id</th>
-
                 <th>SCT Amount</th>
-
               </tr>
             </thead>
             <tbody id="create_info">
@@ -35,140 +26,185 @@
 
         <div class = "col-md-12">
           <table class="table">
-            <thead><h1>BET INFO</h1>
+            <thead><h1 class="text-center text-primary">BET INFO</h1>
               <tr>
                 <th>id</th>
-                <th>result</th>
+                <th>League</th>
+                <th>Game</th>
+                <th>StartTime</th>
+                <th>Status</th>
+                <th>Result</th>
                 <th>ETH Amount</th>
                 <th>SCT Amount</th>
-
               </tr>
             </thead>
-
             <tbody id="betting_info">
             </tbody>
-
           </table>
         </div>
-      </div>
-    </div>
-  </div>
 
-    <div class="container">
-      <div class="row">
-          <div class = "col-md-12">
-
+        <div class = "col-md-12">
           <table class="table">
-            <thead><h1>VERIFY INFO</h1>
+            <thead><h1 class="text-center text-primary">VERIFY INFO</h1>
               <tr>
                 <th>id</th>
-                <th>result</th>
+                <th>Result</th>
                 <th>SCT Amount</th>
-
-
               </tr>
             </thead>
-
             <tbody id="verifying_info">
             </tbody>
-
-
           </table>
         </div>
       </div>
-
-  </div>
-      </div>
     </div>
   </div>
-
-
 
 
 {% endblock body_content %}
 
 {% block script_content %}
 
-  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
-  <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
-  </pingendo>
-
   <!-- Datetime picker -->
   <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
-  <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
-  <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
 
   <script>
   // Script related to web3
 
   var games;
+  var accountAddr;
+  var toto;
+
   function init(){
 
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
 
+    createInstance()
+      .then(getGames)
+      .then(getAccount)
+      .then(getTableContents) // end accountInfo
 
-    Toto.at(contractAddress, function(e, instance) {
-      if(instance){
-      toto = instance;
+  }
 
-      web3.eth.getAccounts(function(e,r){
-        if (r.length > 0){
-          instance.accountInfo(r[0],
-            function(e, r){
+  function createInstance() {
+    return new Promise(function(resolve, reject) {
+      Toto.at(contractAddress, function(e, instance) {
+        toto = instance;
+        resolve(toto);
+      })
+    });
+  }
 
-              for(var i = 0 ; i < r[0].length; i = i + 2){
-                document.getElementById("create_info").innerHTML +=
-                  `<tr>
-                    <td>${r[0][i]}</td>
-                      <td>${r[0][i+1]}</td>
+  function getAccount(){
+    return new Promise(function(resolve, reject){
+      web3.eth.getAccounts(function(e,r) {
+        if(e) console.log(e);
 
-                  </tr>`;
-              }
+        else if (r.length > 0) { accountAddr = r[0]; resolve(accountAddr) }
+        else alert('Please login to metamask first!');
 
-              for(var i = 0 ; i < r[1].length; i = i + 4){
-                document.getElementById("betting_info").innerHTML +=
-                  `<tr>
-                    <td>${r[1][i]}</td>
-                      <td>${r[1][i+1]}</td>
-                      <td>${r[1][i+2]}</td>
-                        <td>${r[1][i+3]}</td>
-                  </tr>`;
-              }
-              for(var i = 0 ; i < r[2].length; i = i + 3){
-                document.getElementById("verifying_info").innerHTML +=
-                  `<tr>
-                    <td>${r[2][i]}</td>
-                      <td>${r[2][i+1]}</td>
-                      <td>${r[2][i+2]}</td>
+      });
+    });
+  }
 
-                  </tr>`;
-              }
-            })
-        }})
+  function getGames() {
+    return new Promise(function(resolve, reject){
+      toto.getGames(function(e,r) {
+        if (e) console.log(e);
+        else {
+          games = r;
+          for (var i=0; i<games.length; ++i){
+            games[i] = Game.at(games[i]);
+          }
+          resolve(games);
+        }
+      });
+    });
+  }
 
+  function getTableContents() {
+    return new Promise(function(resolve, reject){
+      toto.accountInfo(accountAddr, function(e, r){
+        if (e) console.log(e);
+        let createInfo = r[0];
+        let partInfo = r[1];
+        let verifyInfo = r[2];
 
-      }
+        for (var i=0; i<createInfo.length; i+=2){
+          document.getElementById("create_info").innerHTML +=
+              `<tr>
+                <td>${createInfo[i]}</td>
+                  <td>${createInfo[i+1]}</td>
+              </tr>`;
+        }
 
+        for(var i = 0 ; i < partInfo.length; i = i + 4){
+          let gid = partInfo[i];
+          getGameInfo(gid, partInfo[i+1]).then(tds => {
+            document.getElementById("betting_info").innerHTML +=
+                `<tr>
+                  ${tds}
+                  <td>${web3.fromWei(partInfo[i+2], 'ether')} ETH</td>
+                  <td>${partInfo[i+3]} SCT</td>
+                </tr>`;
+          })
+        }
 
+        for(var i = 0 ; i < verifyInfo.length; i = i + 3){
+            document.getElementById("verifying_info").innerHTML +=
+              `<tr>
+                <td>${verifyInfo[i]}</td>
+                  <td>${verifyInfo[i+1]}</td>
+                  <td>${verifyInfo[i+2]} SCT</td>
+              </tr>`;
+        }
+      })
+    })
+  }
 
-  })
-}
-  </script>
+  function getGameInfo(gid, rid){
+    return new Promise(function(resolve, reject) {
+      games[gid].getGameInfo(function(e,r) {
+        let id = r[0].toNumber();
 
+        let gameStr = r[1];
+        let info = gameStr.split(":");
 
+        let league = info[0];
+        let A_DRAW_B = [info[1], 'DRAW', info[2]]
+        let startTime = r[2].toNumber();
 
+        let dt = parseTimestamp(startTime);
+        let noon = "AM";
+        let status;
+
+        if (dt.hour > 12){
+          dt.hour -= 12;
+          noon = "PM";
+        }
+
+        let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
+
+        toto.isGameClosed(id, function(e,r){
+          if (r) status = 3;
+          else status = getStatus(startTime);
+          let result = A_DRAW_B[rid];
+
+          resolve(
+             `<td>${id}</td>
+              <td>${league}</td>
+              <td style="font-weight:bold"><a href='/home/game/${id}'>${A_DRAW_B[0]} : ${A_DRAW_B[2]}</a></td>
+              <td>${time}</td>
+              <td><label class="label" style="background-color: ${gameStatusColor[status]}; color:white">${gameStatus[status]}</label></td>
+              <td>${result}</td>`
+          );
+        });//end isGameClosed
+      }); //end getGameInfo
+    }); //end Promise
+  }
+
+</script>
 
 {% endblock script_content %}
-
-{% block style_content %}
-<style>
-  label {
-    border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
-    padding-right: 0.6em;
-    padding-bottom: 0.3em;
-    padding-left: 0.6em;
-  }
-</style>
-{% endblock style_content %}

@@ -4,7 +4,6 @@
 {% block head_content %}
   <!-- Style for Datetime picker -->
   <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
-  <link href='{% static "home/css/common.css"  %}' rel='stylesheet' type="text/css" media="screen">
 {% endblock head_content %}
 
 {% block body_content %}
@@ -239,8 +238,6 @@
   // Script related to web3
 
   var games;
-  var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSE"];
-  var gameStatusColor = ["#28a745", "#8A2BE2",	"#FFA500", "	#DB7093", "#B22222"];
   function init(){
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
