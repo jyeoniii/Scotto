@@ -15,11 +15,14 @@ interface ERC20 {
 contract Scottoken is ERC20 {
     string public constant symbol = "SCT";
     string public constant name = "SCOTTOKEN";
-    uint8 public constant decimals = 5;
+    uint8 public constant decimals = 0;
 
-    uint private constant __totalSupply = 100000000;
+    uint private constant __totalSupply = 1000000;
+    uint private __circulation = 0;
+
     mapping (address => uint) internal __balanceOf;
     mapping (address => mapping (address => uint)) private __allowances;
+    mapping (address => bool) private faucet_list;
 
     function Scottoken() public {
         __balanceOf[msg.sender] = __totalSupply;
@@ -67,12 +70,21 @@ contract Scottoken is ERC20 {
     }
 
     // For Java VM testing purpose
-    function distributeTokens() {
+    // distribute tokens
+    function faucet() public {
         /* __balanceOf[0xca35b7d915458ef540ade6068dfe2f44e8fa733c] = 100000;
         __balanceOf[0x14723a09acff6d2a60dcdf7aa4aff308fddc160c] = 100000;
         __balanceOf[0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db] = 100000;
         __balanceOf[0x583031d1113ad414f02576bd6afabfb302140225] = 100000;
         __balanceOf[0xdd870fa1b7c4700f2bd7f44238821c26f7392148] = 100000; */
-        __balanceOf[msg.sender] = 100;
+        require(__circulation <= __totalSupply);
+        require(faucet_list[msg.sender] == false);
+        faucet_list[msg.sender] = true;
+        __circulation += 100;
+        __balanceOf[msg.sender] += 100;
+    }
+
+    function getCirculate() public view returns(uint){
+        return __circulation;
     }
 }

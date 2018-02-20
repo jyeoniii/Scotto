@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head_content %}
+  <!-- Style for Datetime picker -->
+  <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
+{% endblock head_content %}
+
+{% block body_content %}
+
+  <!-- Header -->
+  <div class="py-5 text-center h-100" style="background-image: url(&quot;http://www.hdwallpaperup.com/wp-content/uploads/2015/07/Soccer-Beautiful-High-Quality-Wallpaper-1440x900.jpg&quot;);">
+    <div class="container py-5">
+
+
+  <!-- Table -->
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table">
+            <thead>CREATE INFO
+              <tr>
+                <th>id</th>
+                <th>Game</th>
+                <th>SCT Amount</th>
+                <th>ETH Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody id="create_info">
+            </tbody>
+
+
+          </table>
+        </div>
+        <div class = "col-md-12">
+          <table class="table">
+            <thead>BETTING INFO
+              <tr>
+                <th>id</th>
+                <th>Game</th>
+                <th>SCT Amount</th>
+                <th>ETH Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody id="betting_info">
+            </tbody>
+
+          </table>
+        </div>
+          <div class = "col-md-12">
+
+          <table class="table">
+            <thead>VERIFY INFO
+              <tr>
+                <th>id</th>
+                <th>Game</th>
+                <th>SCT Amount</th>
+                <th>ETH Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody id="verifying_info">
+            </tbody>
+
+
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+{% endblock body_content %}
+
+{% block script_content %}
+
+  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
+  <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
+  </pingendo>
+
+  <!-- Datetime picker -->
+  <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
+
+  <script>
+  // Script related to web3
+
+  var games;
+  function init(){
+    Toto = web3.eth.contract(mainAbi);
+    Game = web3.eth.contract(gameAbi);
+
+    console.log(contractAddress);
+
+    Toto.at(contractAddress, function(e, instance) {
+      toto = instance;
+      instance.getGames(function(e,r){
+        if(e){
+          console.log(e);
+        }else {
+          if (r.length == 0) return;
+          games = r;
+
+          for (var i=0; i<games.length; ++i){
+            games[i] = Game.at(games[i]);
+          }
+
+          for (var i=0; i<games.length; ++i){
+            games[i].getGameInfo(function(e,r) {
+              let id = r[0].toNumber();
+
+              let gameStr = r[1];
+              let info = gameStr.split(":");
+
+              let league = info[0];
+              let A = info[1];
+              let B = info[2];
+              let timestamp = r[2].toNumber();
+
+              let dt = parseTimestamp(timestamp);
+              let hour = dt.hour
+              let noon = "AM";
+
+              if (dt.hour > 12){
+                dt.hour -= 12;
+                noon = "PM";
+              }
+
+              let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
+
+              document.getElementById("create_info").innerHTML +=
+                `<tr>
+                  <td>${id}</td>
+                  <td>${league}</td>
+                  <td style="font-weight:bold"><a href='game/${id}'>${A} : ${B}</a></td>
+                  <td>${time}</td>
+                  <td><label class="label" style="background-color: #28a745; color:white">OPEN</label></td>
+                </tr>`;
+            });
+          }
+        }
+      });
+    });
+  }
+
+  </script>
+
+
+  <script type="text/javascript">
+
+    // datetimepicker
+    $('.form_datetime').datetimepicker({
+        //language:  'fr',
+    weekStart: 1,
+    todayBtn:  1,
+  	autoclose: 1,
+  	todayHighlight: 1,
+  	startView: 2,
+  	forceParse: 0,
+    showMeridian: 1
+    });
+
+    // Select Teams
+    function createGame() {
+      var league_opt = document.getElementById('league_selected');
+      var teamA_opt = document.getElementById('teamA_selected');
+      var teamB_opt = document.getElementById('teamB_selected');
+
+      var league = league_opt[league_opt.selectedIndex].value;
+      var teamA = teamA_opt[teamA_opt.selectedIndex].value;
+      var teamB = teamB_opt[teamB_opt.selectedIndex].value;
+
+      var tokenAmount = document.getElementById('create_token_amount').value;
+
+      var game_date = $('.form_datetime').data('datetimepicker').getDate();
+      var timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
+
+      var gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
+
+      if (toto != undefined) {
+        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){
+          if(e) console.log(e);
+        });
+      }
+      console.log(teamA);
+      console.log(teamB);
+      console.log(gameInfoStr);
+      console.log(game_date);
+      console.log(timestamp);
+      console.log(tokenAmount);
+    }
+
+  </script>
+
+{% endblock script_content %}
+
+{% block style_content %}
+<style>
+  label {
+    border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
+    padding-right: 0.6em;
+    padding-bottom: 0.3em;
+    padding-left: 0.6em;
+  }
+</style>
+{% endblock style_content %}

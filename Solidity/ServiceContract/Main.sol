@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.19;
 import "./Game.sol";
 
 import "./Token.sol";
@@ -14,10 +14,18 @@ contract Main is Scottoken{
         GameBalanceLog(id, games[id].balance, balanceOf(games[id]));
     }
 
+    modifier ownerFunc {
+      require(_owner == msg.sender);
+      _;
+    }
+
     struct tempGame {
-        Creator[] creators;
+        address[] creatorArray;
+        uint[] tokenArray;
         uint totalToken;
     }
+
+
 
     //constant
     uint private constant MIN_CREATORS = 1;
@@ -32,23 +40,28 @@ contract Main is Scottoken{
     address _owner;
     mapping (string => tempGame) private tempGames; // string: identifier of the game
 
+    mapping (address => uint[] ) private creatorInfo;
+    mapping (address => uint[] ) private partInfo;
+    mapping (address => uint[] ) private verifierInfo;
+
+
     function Main() public {
         _owner = msg.sender;
-
     }
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
-        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
-        require(isCreatingTime(timestamp) == true);
-        require(tokenAmount >= this.getCirculate() * 25 / 1000); // Not Implemented yet
+        // require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
+        // require(isCreatingTime(timestamp) == true);
+        // require(tokenAmount >= this.getCirculate() * 25 / 1000); // Not Implemented yet
 
         tempGame storage tmpGame = tempGames[gameInfoStr];
-        require(tmpGame.creators.length < MIN_CREATORS);
+        require(tmpGame.creatorArray.length < MIN_CREATORS);
 
 
-        Creator _creator = new Creator(msg.sender, tokenAmount);
+        Game.Creator memory _creator = Game.Creator(msg.sender, tokenAmount);
 
-        tmpGame.creators.push(_creator);
+        tmpGame.creatorArray.push(msg.sender);
+        tmpGame.tokenArray.push(tokenAmount);
         tmpGame.totalToken += tokenAmount;
 
         // token transfer process
@@ -57,19 +70,32 @@ contract Main is Scottoken{
 
         // Create game if condition is met
 
-        if (tmpGame.creators.length >= MIN_CREATORS ) {
-            Game game = new Game(id++, gameInfoStr, tmpGame.creators, tmpGame.totalToken, timestamp);
+        if (tmpGame.creatorArray.length >= MIN_CREATORS ) {
+            Game game = new Game(id, gameInfoStr, tmpGame.creatorArray,tmpGame.tokenArray, tmpGame.totalToken, timestamp);
             games.push(game);
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
+
+
+             for(uint8 i = 0; i < MIN_CREATORS; i ++){
+
+                 creatorInfo[tmpGame.creatorArray[i]].push(id);
+                 creatorInfo[tmpGame.creatorArray[i]].push(tmpGame.tokenArray[i]);
+             }
         }
 
         return games;
     }
 
+     function accountInfo(address _addr) public view returns (uint[], uint[], uint[]){
+        return (creatorInfo[_addr], partInfo[_addr], verifierInfo[_addr]);
+     }
+
+
+
     function betGame(uint _id, uint tokenAmount, uint8 result) public logging(_id) payable {
-        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
-        require(result>= 0 && result <= 2);
-        require(isBettingTime(game));
+        // require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
+        // require(result>= 0 && result <= 2);
+        // require(isBettingTime(game));
 
         Game game = games[_id];
         game.addBettingInfo(msg.sender, msg.value, tokenAmount, result);
@@ -80,11 +106,16 @@ contract Main is Scottoken{
         __balanceOf[this] += tokenAmount;
 
         this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
+
+        partInfo[msg.sender].push(_id);
+        partInfo[msg.sender].push(result);
+        partInfo[msg.sender].push(msg.value);
+        partInfo[msg.sender].push(tokenAmount);
     }
 
 
     function enterResult(uint _id, uint tokenAmount, uint8 result) logging(_id) public {
-        require(isResultTime(game));
+        // require(isResultTime(game));
         Game game = games[_id];
         game.enterResult(msg.sender, tokenAmount, result);
 
@@ -92,17 +123,20 @@ contract Main is Scottoken{
        __balanceOf[this] += tokenAmount;
 
        this.approve(game, tokenAmount); // approve game instance to transfer token in Main Contract
+
+       verifierInfo[msg.sender].push(_id);
+       verifierInfo[msg.sender].push(result);
+       verifierInfo[msg.sender].push(tokenAmount);
     }
 
 
     function checkResult(uint _id) logging(_id) public { // when user triggers event after the result has been decided
         Game game = games[_id];
-        require(isRewardingTime(game));
+        // require(isRewardingTime(game));
         game.finalize();
 
         if(game.balance > 0 )
-            game.settle(_owner);
-
+            game.settle(msg.sender);
     }
 
 
@@ -158,10 +192,12 @@ contract Main is Scottoken{
       return tokenAmount;
     }
 
-    function getGames() view returns (Game[]) {
+    function getGames() public view returns (Game[]) {
         return games;
     }
 
-
+     function self_destruct() public ownerFunc(){
+       selfdestruct(_owner);
+     }
 
 }

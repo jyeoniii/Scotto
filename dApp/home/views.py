@@ -9,3 +9,6 @@ def main(request):
 
 def game(request, id):
   return render(request, 'home/game.html', {"gid":id})
+
+def account(request):
+    return render(request, 'home/account.html')

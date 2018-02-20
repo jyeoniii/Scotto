@@ -53,7 +53,7 @@ var gameAbi = [
 		"constant": false,
 		"inputs": [
 			{
-				"name": "_owner",
+				"name": "addr",
 				"type": "address"
 			}
 		],
@@ -114,46 +114,32 @@ var gameAbi = [
 		"name": "getBettingInfo",
 		"outputs": [
 			{
-				"name": "etherA",
+				"name": "",
 				"type": "uint256"
 			},
 			{
-				"name": "tokenA",
+				"name": "",
 				"type": "uint256"
 			},
 			{
-				"name": "etherB",
+				"name": "",
 				"type": "uint256"
 			},
 			{
-				"name": "tokenB",
+				"name": "",
 				"type": "uint256"
 			},
 			{
-				"name": "etherDraw",
+				"name": "",
 				"type": "uint256"
 			},
 			{
-				"name": "tokenDraw",
+				"name": "",
 				"type": "uint256"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "result",
-				"type": "uint8"
-			}
-		],
-		"name": "initDistribute",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -233,8 +219,12 @@ var gameAbi = [
 				"type": "string"
 			},
 			{
-				"name": "_creators",
+				"name": "creatorArray",
 				"type": "address[]"
+			},
+			{
+				"name": "tokenArray",
+				"type": "uint256[]"
 			},
 			{
 				"name": "_creatorTokens",

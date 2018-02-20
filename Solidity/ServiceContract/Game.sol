@@ -1,5 +1,5 @@
-pragma solidity ^0.4.18;
-import "./Creator.sol";
+pragma solidity ^0.4.19;
+
 import "./Token.sol";
 
 contract Game {
@@ -7,11 +7,25 @@ contract Game {
 
     ERC20 token;
     bool close = false;
+    address __main__;
+
 
     event bettingLog(uint result, address addr, uint etherAmount, uint tokenAmount);
     event verifyingLog(uint result, address addr, uint tokenAmount);
 
+    modifier mainFunc {
+      require(__main__ == msg.sender);
+      _;
+    }
 
+    modifier gameFunc {
+      require(this == msg.sender);
+      _;
+    }
+    struct Creator {
+        address addr;
+        uint tokenAmount;
+    }
     struct Participant {
         address addr;
         uint etherAmount;
@@ -78,13 +92,15 @@ contract Game {
     uint rewardTokenPool = 0;         // Tokens from every participants & wrong verifier
 
 
-    function Game(uint _id, string _gameInfoStr, Creator[] _creators, uint _creatorTokens, uint timestamp) public {
+    function Game(uint _id, string _gameInfoStr, address[] creatorArray,uint[] tokenArray, uint _creatorTokens, uint timestamp) public {
         id = _id;
         gameInfoStr = _gameInfoStr;
-        creators = _creators;
+        for(uint i = 0; i < creatorArray.length; i ++){
+        creators.push(Creator(creatorArray[i], tokenArray[i]));
+        }
         start = timestamp;
         creatorTokens = _creatorTokens;
-
+        __main__ = msg.sender;
         token =  ERC20(msg.sender); //use SCOTTOKEN instance
     }
 
@@ -94,7 +110,7 @@ contract Game {
             2 (bet to B)
             TODO: should be payable
     */
-    function addBettingInfo(address sender, uint etherAmount, uint tokenAmount, uint8 result) public {
+    function addBettingInfo(address sender, uint etherAmount, uint tokenAmount, uint8 result) public mainFunc {
 
         Participant memory part = Participant(sender, etherAmount, tokenAmount, result);
         resultStat[result].participants.push(part);
@@ -106,7 +122,7 @@ contract Game {
         bettingLog(result, sender, etherAmount, tokenAmount);
     }
 
-    function enterResult(address sender, uint tokenAmount, uint8 result) public {
+    function enterResult(address sender, uint tokenAmount, uint8 result) public mainFunc {
          /* Participant x = Participant(betting[1][0]); */
          Verifier memory verifier = Verifier(sender, tokenAmount, result);
 
@@ -117,7 +133,7 @@ contract Game {
           verifyingLog(result, verifier.addr, verifier.tokenAmount);
     }
 
-    function getStartTime() public view returns (uint) {
+    function getStartTime() public view  returns (uint) {
         return start;
     }
 
@@ -126,7 +142,7 @@ contract Game {
     Determine the results
     Reward participants
      */
-    function finalize() public returns (uint8[]) {
+    function finalize() public mainFunc returns (uint8[]) {
       uint8 winIdx;
       uint8 loseIdx;
       resultStatus memory stat;
@@ -157,9 +173,9 @@ contract Game {
         rewardTokenPool += stat.totalTokenBetted + stat.totalTokenFromVerifiers;
       }
 
-      this.rewardCreators();
-      this.rewardParticipants();
-      this.rewardVerifier();
+      rewardCreators();
+      rewardParticipants();
+      rewardVerifier();
 
     }
 
@@ -170,7 +186,7 @@ contract Game {
         2. Tokens: Same amount with collateralized tokens
     */
     event rewardCreatorLog(uint baseToken, uint rewardToken, uint rewardEther);
-    function rewardCreators() public payable {
+    function rewardCreators() public payable gameFunc {
         // 10% of etherForCompensation will be used for fee => 10% of it will be used to reward creators
         uint etherForCreators = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_CREATOR / 10;
         uint tokenForCreators = rewardTokenPool * TOKEN_POOL_CREATOR / 10;
@@ -178,24 +194,24 @@ contract Game {
 
         for (uint i=0; i<creators.length; ++i) {
             // give token back to creators
-            token.transferFrom(token, creators[i].getAddr(), creators[i].getTokenAmount());
+            token.transferFrom(token, creators[i].addr, creators[i].tokenAmount);
 
             // token compensation for creators
-            token.transferFrom(token, creators[i].getAddr(), tokenForCreators * creators[i].getTokenAmount() / creatorTokens);
+            token.transferFrom(token, creators[i].addr, tokenForCreators * creators[i].tokenAmount / creatorTokens);
 
             // ethereum compensation for creators
-            creators[i].getAddr().transfer(etherForCreators * creators[i].getTokenAmount() / creatorTokens);
+            creators[i].addr.transfer(etherForCreators * creators[i].tokenAmount / creatorTokens);
 
-            rewardCreatorLog(creators[i].getTokenAmount(),
-                             tokenForCreators * creators[i].getTokenAmount() / creatorTokens,
-                             etherForCreators * creators[i].getTokenAmount() / creatorTokens);
+            rewardCreatorLog(creators[i].tokenAmount,
+                             tokenForCreators * creators[i].tokenAmount / creatorTokens,
+                             etherForCreators * creators[i].tokenAmount / creatorTokens);
         }
 
     }
 
     event rewardWinnerLog(uint tokenAmount, uint etherAmount, uint rewardToken, uint rewardEther, uint additionalEther);
     event rewardLoserLog(uint tokenAmount, uint rewardToken);
-    function rewardParticipants() public payable {
+    function rewardParticipants() public payable gameFunc {
         Participant memory part;
         Participant[] memory winners;
         Participant[] memory losers;
@@ -245,7 +261,7 @@ contract Game {
     }
 
     event rewardVerifierLog(uint tokenAmount, uint rewardToken, uint rewardEther);
-    function rewardVerifier() public payable {
+    function rewardVerifier() public payable gameFunc{
         Verifier[] memory verifiers;
         Verifier memory verifier;
 
@@ -273,7 +289,7 @@ contract Game {
         }
     }
 
-    function initDistribute(uint8 result) public {
+    function initDistribute(uint8 result) private gameFunc {
         Participant memory part;
         Verifier memory ver;
 
@@ -293,7 +309,7 @@ contract Game {
         }
     }
 
-    function maxResult(uint a, uint b, uint c) external {
+    function maxResult(uint a, uint b, uint c)  external {
 
        if(a > b){
             if(b >= c )
@@ -361,9 +377,9 @@ contract Game {
 
     }
 
-    function settle(address _owner) public payable{
+    function settle(address addr) public payable mainFunc{
         close = true;
-        _owner.transfer(this.balance);
+        addr.transfer(this.balance);
     }
 
     /* For frontend */
@@ -371,9 +387,7 @@ contract Game {
         return (id, gameInfoStr, start);
     }
 
-    function getBettingInfo() public view returns (uint etherA, uint tokenA,
-                                                   uint etherB, uint tokenB,
-                                                   uint etherDraw, uint tokenDraw){
+    function getBettingInfo() public view returns (uint, uint, uint, uint ,uint ,uint ){
         return (resultStat[0].totalEtherBetted, resultStat[0].totalTokenBetted,
                 resultStat[1].totalEtherBetted, resultStat[1].totalTokenBetted,
                 resultStat[2].totalEtherBetted, resultStat[2].totalTokenBetted);
