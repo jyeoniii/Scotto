@@ -4,6 +4,7 @@
 {% block head_content %}
   <!-- Style for Datetime picker -->
   <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
+  <link href='{% static "home/css/common.css"  %}' rel='stylesheet' type="text/css" media="screen">
 {% endblock head_content %}
 
 {% block body_content %}
@@ -52,7 +53,7 @@
                 </form>
 
                  <!-- Datetime picker-->
-                 <div class="input-group date form_datetime col-md-4" data-date="1979-09-16T05:25:07Z" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
+                 <div class="input-group date form_datetime col-md-4" data-date-format="dd MM yyyy - HH:ii p" data-link-field="dtp_input1">
                     <input class="form-control" size="16" type="text" value="" readonly>
                     <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
 					          <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
@@ -60,7 +61,7 @@
 				         <input type="hidden" id="dtp_input1" value="" /><br/>
            </form>
            <!-- Token Amount -->
-           <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="No.tokens">
+           <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="No. SCT">
           </div>
           <button class="col-md-6 btn btn-lg btn-primary" onclick="createGame()" style="font-weight:bold">Submit</button>
 
@@ -140,43 +141,6 @@
           <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
           <p class="my-4"><i>Jaeyeon Kim</i></p>
           <p><b>Princess</b>
-            <br>Boss</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="py-5 text-center" style="color:white">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <h1>Advisor</h1>
-          <p class="lead">We grow together with the community</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-3 p-2">
-          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_meow.jpg">
-          <p class="my-4"><i>Jamie Park</i></p>
-          <p><b>Meow</b>
-            <br>Senior developer</p>
-        </div>
-        <div class="col-md-3 p-2">
-          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_fish.jpg">
-          <p class="my-4"><i>Changha Kim</i></p>
-          <p><b>J. L. Fish</b>
-            <br>UI designer</p>
-        </div>
-        <div class="col-md-3 p-2">
-          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
-          <p class="my-4"><i>Youngsu Ko</i></p>
-          <p><b>Carlito</b>
-            <br>Boss</p>
-        </div>
-        <div class="col-md-3 p-2">
-          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
-          <p class="my-4"><i>Junsoo Jung</i></p>
-          <p><b>Carlito</b>
             <br>Boss</p>
         </div>
       </div>
@@ -275,8 +239,8 @@
   // Script related to web3
 
   var games;
-  var gameStatus = ["BETTING", "RESULT", "REWARD", "CLOSE"];
-  var gameStatusColor = ["#28a745", "	#FFA500", "	#DB7093", "#B22222"];
+  var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSE"];
+  var gameStatusColor = ["#28a745", "#8A2BE2",	"#FFA500", "	#DB7093", "#B22222"];
   function init(){
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
@@ -292,6 +256,8 @@
         for (var i=0; i<games.length; ++i){
           games[i] = Game.at(games[i]);
         }
+
+        games = games.reverse();
 
         for (var i=0; i<games.length; ++i){
           games[i].getGameInfo(function(e,r) {
@@ -316,7 +282,7 @@
 
             let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
 
-            instance.isGameClose(id, function(e,r){
+            instance.isGameClosed(id, function(e,r){
               if (r) status = 3;
               else {
                 status = getStatus(startTime);
@@ -325,11 +291,11 @@
                 `<tr>
                   <td>${id}</td>
                   <td>${league}</td>
-                  <td style="font-weight:bold"><a href='home/game/${id}'>${A} : ${B}</a></td>
+                  <td style="font-weight:bold"><a href='/home/game/${id}'>${A} : ${B}</a></td>
                   <td>${time}</td>
                   <td><label class="label" style="background-color: ${gameStatusColor[status]}; color:white">${gameStatus[status]}</label></td>
                 </tr>`;
-            });//end isGameClose
+            });//end isGameClosed
           });
         }//end for
       });//end getGames
@@ -350,7 +316,7 @@
   	todayHighlight: 1,
   	startView: 2,
   	forceParse: 0,
-    showMeridian: 1
+    showMeridian: 1,
     });
 
     var leagues;
@@ -375,7 +341,7 @@
             $("select#teamB_selected").attr('disabled', true);
           }
           else {
-            var url = "home/league/" + $(this).val().replace(" ", "_") + "/all_json_models";
+            var url = "/home/league/" + $(this).val().replace(" ", "_") + "/all_json_models";
             var team = $(this).val();
             $.getJSON(url, function(models) {
               var options = '<optgroup label="Team"><option value="Z" disabled selected hidden>Team</option>';
@@ -423,9 +389,14 @@
 
       var gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
 
-      if (toto != undefined) {
+
+      if (confirm(`Are you sure you want to create this game?\n
+                  ${league} - ${teamA} vs ${teamB}
+                  ${game_date.getFullYear()}/${game_date.getMonth()+1}/${game_date.getDate()} ${game_date.getHours()}:${game_date.getMinutes()}`) &&
+          toto != undefined) {
         toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){
           if(e) console.log(e);
+          else alert("Successfully voted to create a game!")
         });
       }
     }
@@ -433,14 +404,3 @@
   </script>
 
 {% endblock script_content %}
-
-{% block style_content %}
-<style>
-  label {
-    border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
-    padding-right: 0.6em;
-    padding-bottom: 0.3em;
-    padding-left: 0.6em;
-  }
-</style>
-{% endblock style_content %}

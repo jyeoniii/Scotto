@@ -161,7 +161,9 @@ function getStatus(startTime){
   let date = new Date();
   let now = toTimestamp(date.getFullYear(), date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes(), 0);
 
-  if (now < startTime && now > startTime - BETTING_TIME) return 0;  // Betting
-  else if (now < startTime + PLAYTING_TIME && now < startTime + PLAYTING_TIME + RESULT_TIME) return 1;  // Result
-  else if (now > startTime + PLAYTING_TIME + RESULT_TIME) return 2;
+  if (now > startTime - BETTING_TIME && now < startTime) return 0;  // Betting
+  else if (now >= startTime && now < startTime + PLAYTING_TIME) return 1;  // Playing
+  else if (now >= startTime + PLAYTING_TIME && now < startTime + PLAYTING_TIME + RESULT_TIME) return 2;  // Result
+  else if (now >= startTime + PLAYTING_TIME + RESULT_TIME) return 3; // Reward
+  else return -1;
 }

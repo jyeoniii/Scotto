@@ -177,6 +177,8 @@ contract Game {
       rewardParticipants();
       rewardVerifier();
 
+      close = true;
+
     }
 
     // Rewarding functions
@@ -378,7 +380,6 @@ contract Game {
     }
 
     function settle(address addr) public payable mainFunc{
-        close = true;
         addr.transfer(this.balance);
     }
 
@@ -393,7 +394,7 @@ contract Game {
                 resultStat[2].totalEtherBetted, resultStat[2].totalTokenBetted);
     }
 
-    function isClose() public view returns (bool){
+    function isClosed() public view returns (bool){
         return close;
     }
 

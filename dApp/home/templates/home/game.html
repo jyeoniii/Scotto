@@ -4,6 +4,7 @@
 {% block head_content %}
   <input hidden id="gid" value={{gid}}>
   <link rel="stylesheet" href="{% static 'FlipClock-master/compiled/flipclock.css' %}">
+  <link href='{% static "home/css/common.css"  %}' rel='stylesheet' type="text/css" media="screen">
 {% endblock head_content %}
 
 {% block body_content %}
@@ -19,10 +20,19 @@
           </h1>
           <h3 class="text-center text-secondary" style="font-weight:bold" id="league"></h3>
           <h6 class="text-center" id="time"></h6>
+          <div id="playingDiv" style="display:none">
+            <br><br><br>
+            <h1 class="text-center" style="font-weight:bold;font-size:100"><label style="background-color:#8A2BE2">PLAYING</label></h1>
+          </div>
+          <div id="closeDiv" style="display:none">
+            <br><br><br>
+            <h1 class="text-center" style="font-weight:bold;font-size:100"><label style="background-color:#B22222">CLOSED</label></h1>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
 
   <!-- Counter -->
   <div class="container">
@@ -38,7 +48,7 @@
   </div>
 
   <!-- Betting -->
-  <div class="py-5">
+  <div class="py-5" id="bettingDiv" style="display:none">
     <div class="container">
       <div class="row">
         <div class="col-xl-9 mx-auto">
@@ -69,7 +79,7 @@
   </div>
 
   <!-- Enter Result -->
-  <div class="py-5">
+  <div class="py-5" id="resultDiv" style="display:none">
     <div class="container">
       <div class="row">
         <div class="col-xl-9 mx-auto">
@@ -90,6 +100,22 @@
             </div>
             <div class="form-row col-md-12 mx-auto" style="margin-top:50px">
               <button class="col-md-6 btn btn-outline-primary" style="margin:auto" onclick="enterResult()">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="py-5" id="rewardDiv" style="display:none">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-9 mx-auto">
+          <div class="mb-5">
+            <div class="form-row col-md-12 mx-auto">
+              <button class="col-md-12 btn btn-outline-primary" onclick="reward()">
+                <h2 style="font-weight:bold">Reward</h2>
+              </button>
             </div>
           </div>
         </div>
@@ -146,13 +172,11 @@
 {% block script_content %}
 
   <script src="{% static 'FlipClock-master/compiled/flipclock.min.js' %}"></script>
-  <script src="{% static 'FlipClock-master/compiled/flipclock.min.js' %}"></script>
 
   <script type="text/javascript">
 		var clock;
 
 		$(document).ready(function() {
-			var clock;
 
 			clock = $('.clock').FlipClock({
 		        clockFace: 'DailyCounter',
@@ -164,10 +188,6 @@
 		        }
 		    });
 
-		    clock.setTime(220880);
-		    clock.setCountdown(true);
-		    clock.start();
-
 		});
 	</script>
 
@@ -178,11 +198,12 @@
   var gameAddr;
   var game;
   var gid;
+  var status;
 
   function init(){
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
-    gid = document.getElementById("gid").value;
+    gid = parseInt(document.getElementById("gid").value);
 
     console.log(contractAddress);
 
@@ -200,6 +221,7 @@
         getGameInfo();
         getBettingInfo();
       });
+
     });
   }
 
@@ -212,10 +234,10 @@
       let A = info[1];
       let B = info[2];
 
-      let timestamp = r[2].toNumber();
+      let startTime = r[2].toNumber();
 
-      let dt = parseTimestamp(timestamp);
-      let hour = dt.hour
+      let dt = parseTimestamp(startTime);
+      let hour = dt.hour;
       let noon = "AM";
 
       if (dt.hour > 12){
@@ -239,8 +261,60 @@
       document.getElementById("league").innerHTML = league;
       document.getElementById("time").innerHTML = time;
 
+      toto.isGameClosed(gid, function(e,r) {
+        if (r) status = 4;
+        else {
+          status = getStatus(startTime);
+          changeTemplateStatus(status, startTime);
+        }
+      })
+
     });
   }
+
+  function changeTemplateStatus(status, startTime) {
+    if (status == 0) {  // Betting
+      document.getElementById("bettingDiv").style.display = "block";
+
+      let date = new Date();
+      let now = toTimestamp(date.getFullYear(), date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
+
+      clock.setTime(startTime - now);
+      console.log(startTime);
+      clock.setCountdown(true);
+      clock.start();
+    }
+    else if (status == 1) { // PLAYING
+      document.getElementById("playingDiv").style.display = "block";
+
+      let date = new Date();
+      let now = toTimestamp(date.getFullYear(), date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
+
+      clock.setTime(startTime + PLAYTING_TIME - now)
+      clock.setCountdown(true);
+      clock.start();
+    }
+    else if (status == 2) { // Result
+      document.getElementById("resultDiv").style.display = "block";
+
+      let date = new Date();
+      let now = toTimestamp(date.getFullYear(), date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
+
+      clock.setTime(startTime + PLAYTING_TIME + RESULT_TIME - now);
+      clock.setCountdown(true);
+      clock.start();
+    }
+    else if (status == 3) { // Reward
+      document.getElementById("rewardDiv").style.display = "block";
+      clock.setTime(0);
+    }
+    else if (status == 4) { // Close
+      document.getElementById("closdDiv").style.display = "block";
+      clock.setTime(0);
+    }
+    else console.log(`Invalid status (${status})`);
+  }
+
 
   function getBettingInfo() {
     game.getBettingInfo(function(e,r){
@@ -267,15 +341,8 @@
     var etherAmount = document.getElementById('ether_amount').value;
     var tokenAmount = parseInt(document.getElementById('token_amount').value);
 
-    console.log(result);
-    console.log(etherAmount);
-    console.log(tokenAmount);
-
     toto.betGame(gid, tokenAmount, result, {value:web3.toWei(etherAmount, 'ether')}, function(e,r){
-      if (e){
-        console.log(e);
-        return;
-      }
+      if (e){ console.log(e); return; }
     });
   }
 
@@ -285,16 +352,18 @@
 
     var tokenAmount = parseInt(document.getElementById('result_token_amount').value);
 
-    console.log(result);
-    console.log(tokenAmount);
-
     toto.enterResult(gid, tokenAmount, result, function(e,r) {
-      if (e) {
-        console.log(e);
-        return;
-      }
+      if (e) { console.log(e); }
     });
   }
 
+  function reward() {
+    toto.checkResult(gid, function(e,r) {
+      if (e) { console.log(e);}
+      alert('Rewarding has been finished!')
+    })
+  }
+
   </script>
+
 {% endblock script_content %}

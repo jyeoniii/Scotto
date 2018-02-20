@@ -50,7 +50,7 @@ contract Main is Scottoken{
     }
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
-        // require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
+        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
         // require(isCreatingTime(timestamp) == true);
         // require(tokenAmount >= this.getCirculate() * 25 / 1000); // Not Implemented yet
 
@@ -93,8 +93,8 @@ contract Main is Scottoken{
 
 
     function betGame(uint _id, uint tokenAmount, uint8 result) public logging(_id) payable {
-        // require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
-        // require(result>= 0 && result <= 2);
+        require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
+        require(result>= 0 && result <= 2);
         // require(isBettingTime(game));
 
         Game game = games[_id];
@@ -131,8 +131,10 @@ contract Main is Scottoken{
 
 
     function checkResult(uint _id) logging(_id) public { // when user triggers event after the result has been decided
-        Game game = games[_id];
         // require(isRewardingTime(game));
+        require(!isGameClosed(_id));
+
+        Game game = games[_id];
         game.finalize();
 
         if(game.balance > 0 )
@@ -177,8 +179,8 @@ contract Main is Scottoken{
 
 
 
-    function isGameClose(uint _id) public view returns (bool){
-        return games[_id].isClose();
+    function isGameClosed(uint _id) public view returns (bool){
+        return games[_id].isClosed();
     }
 
     //test
