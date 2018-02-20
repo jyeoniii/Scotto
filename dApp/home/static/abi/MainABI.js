@@ -1,67 +1,17 @@
-var contractAddress = "0x9d8ed3a2051a2fc56ac54c0f477a4e35a129a01d";
+var contractAddress = "0x3ede67dc13b58b29fdf89e0bfc2a6971271bbba0";
 var mainAbi =[
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "name",
+		"name": "decimals",
 		"outputs": [
 			{
 				"name": "",
-				"type": "string"
+				"type": "uint8"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_spender",
-				"type": "address"
-			},
-			{
-				"name": "_value",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [
-			{
-				"name": "success",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "gameInfoStr",
-				"type": "string"
-			},
-			{
-				"name": "timestamp",
-				"type": "uint256"
-			},
-			{
-				"name": "tokenAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "createGame",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address[]"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -79,40 +29,13 @@ var mainAbi =[
 		"type": "function"
 	},
 	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_from",
-				"type": "address"
-			},
-			{
-				"name": "_to",
-				"type": "address"
-			},
-			{
-				"name": "_value",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [
-			{
-				"name": "success",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"constant": true,
 		"inputs": [],
-		"name": "decimals",
+		"name": "symbol",
 		"outputs": [
 			{
 				"name": "",
-				"type": "uint8"
+				"type": "string"
 			}
 		],
 		"payable": false,
@@ -120,43 +43,21 @@ var mainAbi =[
 		"type": "function"
 	},
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
 			{
-				"name": "_id",
-				"type": "uint256"
+				"name": "_owner",
+				"type": "address"
 			},
 			{
-				"name": "tokenAmount",
-				"type": "uint256"
-			},
-			{
-				"name": "result",
-				"type": "uint8"
+				"name": "_spender",
+				"type": "address"
 			}
 		],
-		"name": "enterResult",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "self_destruct",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getCirculate",
+		"name": "allowance",
 		"outputs": [
 			{
-				"name": "",
+				"name": "remaining",
 				"type": "uint256"
 			}
 		],
@@ -172,11 +73,33 @@ var mainAbi =[
 				"type": "address"
 			}
 		],
-		"name": "balanceOf",
+		"name": "accountInfo",
 		"outputs": [
 			{
-				"name": "balance",
-				"type": "uint256"
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"name": "",
+				"type": "uint256[]"
+			},
+			{
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
 			}
 		],
 		"payable": false,
@@ -219,11 +142,11 @@ var mainAbi =[
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "symbol",
+		"name": "getGames",
 		"outputs": [
 			{
 				"name": "",
-				"type": "string"
+				"type": "address[]"
 			}
 		],
 		"payable": false,
@@ -231,25 +154,17 @@ var mainAbi =[
 		"type": "function"
 	},
 	{
-		"constant": false,
-		"inputs": [
+		"constant": true,
+		"inputs": [],
+		"name": "getCirculate",
+		"outputs": [
 			{
-				"name": "_id",
+				"name": "",
 				"type": "uint256"
-			},
-			{
-				"name": "tokenAmount",
-				"type": "uint256"
-			},
-			{
-				"name": "result",
-				"type": "uint8"
 			}
 		],
-		"name": "betGame",
-		"outputs": [],
-		"payable": true,
-		"stateMutability": "payable",
+		"payable": false,
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -260,23 +175,105 @@ var mainAbi =[
 				"type": "address"
 			}
 		],
-		"name": "accountInfo",
+		"name": "balanceOf",
 		"outputs": [
 			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
-			},
-			{
-				"name": "",
-				"type": "uint256[]"
+				"name": "balance",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"name": "_owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "_spender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_spender",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [
+			{
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_from",
+				"type": "address"
+			},
+			{
+				"name": "_to",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [
+			{
+				"name": "success",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "self_destruct",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "faucet",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -303,50 +300,16 @@ var mainAbi =[
 		"type": "function"
 	},
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "getGames",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address[]"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
+		"anonymous": false,
 		"inputs": [
 			{
-				"name": "_owner",
-				"type": "address"
-			},
-			{
-				"name": "_spender",
-				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
-				"name": "remaining",
+				"indexed": false,
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "faucet",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
+		"name": "transferAmount",
+		"type": "event"
 	},
 	{
 		"constant": false,
@@ -361,43 +324,6 @@ var mainAbi =[
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "list",
-				"type": "address[]"
-			}
-		],
-		"name": "pushBalance",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "etherAmount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "tokenAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "MainBalanceLog",
-		"type": "event"
 	},
 	{
 		"anonymous": false,
@@ -426,34 +352,23 @@ var mainAbi =[
 		"inputs": [
 			{
 				"indexed": false,
-				"name": "addr",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "etherBalance",
+				"name": "etherAmount",
 				"type": "uint256"
 			},
 			{
 				"indexed": false,
-				"name": "tokenBalance",
+				"name": "tokenAmount",
 				"type": "uint256"
 			}
 		],
-		"name": "balanceLog",
+		"name": "MainBalanceLog",
 		"type": "event"
 	},
 	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "transferAmount",
-		"type": "event"
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
 	},
 	{
 		"anonymous": false,
@@ -478,25 +393,110 @@ var mainAbi =[
 		"type": "event"
 	},
 	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"name": "tokenAmount",
+				"type": "uint256"
+			},
+			{
+				"name": "result",
+				"type": "uint8"
+			}
+		],
+		"name": "betGame",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "gameInfoStr",
+				"type": "string"
+			},
+			{
+				"name": "timestamp",
+				"type": "uint256"
+			},
+			{
+				"name": "tokenAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "createGame",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"name": "tokenAmount",
+				"type": "uint256"
+			},
+			{
+				"name": "result",
+				"type": "uint8"
+			}
+		],
+		"name": "enterResult",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"name": "_owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"name": "_spender",
+				"indexed": false,
+				"name": "addr",
 				"type": "address"
 			},
 			{
 				"indexed": false,
-				"name": "_value",
+				"name": "etherBalance",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "tokenBalance",
 				"type": "uint256"
 			}
 		],
-		"name": "Approval",
+		"name": "balanceLog",
 		"type": "event"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "list",
+				"type": "address[]"
+			}
+		],
+		"name": "pushBalance",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ]
