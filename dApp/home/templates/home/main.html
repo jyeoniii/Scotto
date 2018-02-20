@@ -9,7 +9,7 @@
 {% block body_content %}
 
   <!-- Header -->
-  <div class="py-5 text-center h-100" style="background-image: url(&quot;http://www.hdwallpaperup.com/wp-content/uploads/2015/07/Soccer-Beautiful-High-Quality-Wallpaper-1440x900.jpg&quot;);">
+  <div class="py-5 text-center h-100" style="background-image: url(&quot;http://wallpaper-gallery.net/images/soccer-wallpapers/soccer-wallpapers-7.jpg&quot;);">
     <div class="container py-5">
       <div class="row">
         <div class="col-md-12" style="font-family: Helvetica Neue">
@@ -62,7 +62,7 @@
            <!-- Token Amount -->
            <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="No.tokens">
           </div>
-          <button class="col-md-6 btn btn-lg btn-secondary" onclick="createGame()">Submit</button>
+          <button class="col-md-6 btn btn-lg btn-primary" onclick="createGame()" style="font-weight:bold">Submit</button>
 
       </div>
     </div>
@@ -125,38 +125,70 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1>Testimonials columns</h1>
+          <h1>Developers</h1>
           <p class="lead">We grow together with the community</p>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-4 p-4">
+        <div class="col-md-6 p-2">
           <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_meow.jpg">
-          <p class="my-4"><i>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</i></p>
+          <p class="my-4"><i>Hyunyoung Jung</i></p>
+          <p><b>Sacrificer & Mental Contributer</b>
+            <br>CEO</p>
+        </div>
+        <div class="col-md-6 p-2">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
+          <p class="my-4"><i>Jaeyeon Kim</i></p>
+          <p><b>Princess</b>
+            <br>Boss</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="py-5 text-center" style="color:white">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Advisor</h1>
+          <p class="lead">We grow together with the community</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 p-2">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_meow.jpg">
+          <p class="my-4"><i>Jamie Park</i></p>
           <p><b>Meow</b>
             <br>Senior developer</p>
         </div>
-        <div class="col-md-4 p-4">
+        <div class="col-md-3 p-2">
           <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_fish.jpg">
-          <p class="my-4"><i>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec. </i></p>
+          <p class="my-4"><i>Changha Kim</i></p>
           <p><b>J. L. Fish</b>
             <br>UI designer</p>
         </div>
-        <div class="col-md-4 p-4">
+        <div class="col-md-3 p-2">
           <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
-          <p class="my-4"><i>Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Cum sociis natoque penatibus et magnis dis parturient montes.</i></p>
+          <p class="my-4"><i>Youngsu Ko</i></p>
+          <p><b>Carlito</b>
+            <br>Boss</p>
+        </div>
+        <div class="col-md-3 p-2">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
+          <p class="my-4"><i>Junsoo Jung</i></p>
           <p><b>Carlito</b>
             <br>Boss</p>
         </div>
       </div>
     </div>
   </div>
+
   <div class="py-5">
     <div class="container">
       <div class="row text-center">
         <div class="col-md-12">
           <h1 class="mb-4 text-primary">Benefits and features</h1>
-          <p class="lead">Design unique interfaces by customizing Bootstrap theme with Pingendo.
+          <p class="lead">
             <br>Modify colors, fonts and grid setting without opening any CSS file.</p>
           <div class="row text-left mt-5">
             <div class="col-md-4 my-3">
@@ -233,11 +265,6 @@
 {% endblock body_content %}
 
 {% block script_content %}
-
-  <pingendo onclick="window.open('https://pingendo.com/', '_blank')" style="cursor:pointer;position: fixed;bottom: 10px;right:10px;padding:4px;background-color: #00b0eb;border-radius: 8px; width:180px;display:flex;flex-direction:row;align-items:center;justify-content:center;font-size:14px;color:white">Made with Pingendo&nbsp;&nbsp;
-  <img src="https://pingendo.com/site-assets/Pingendo_logo_big.png" class="d-block" alt="Pingendo logo" height="16">
-  </pingendo>
-
   <!-- Datetime picker -->
   <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
@@ -248,6 +275,8 @@
   // Script related to web3
 
   var games;
+  var gameStatus = ["BETTING", "RESULT", "REWARD", "CLOSE"];
+  var gameStatusColor = ["#28a745", "	#FFA500", "	#DB7093", "#B22222"];
   function init(){
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
@@ -256,54 +285,56 @@
 
     Toto.at(contractAddress, function(e, instance) {
       toto = instance;
-      instance.getGames(function(e,r){
-        if(e){
-          console.log(e);
-        }else {
-          if (r.length == 0) return;
-          games = r;
+      instance.getGames(function(e,games){
+        if(e){ console.log(e); return; }
+        if (games.length == 0) return;
 
-          for (var i=0; i<games.length; ++i){
-            games[i] = Game.at(games[i]);
-          }
+        for (var i=0; i<games.length; ++i){
+          games[i] = Game.at(games[i]);
+        }
 
-          for (var i=0; i<games.length; ++i){
-            games[i].getGameInfo(function(e,r) {
-              let id = r[0].toNumber();
+        for (var i=0; i<games.length; ++i){
+          games[i].getGameInfo(function(e,r) {
+            let id = r[0].toNumber();
 
-              let gameStr = r[1];
-              let info = gameStr.split(":");
+            let gameStr = r[1];
+            let info = gameStr.split(":");
 
-              let league = info[0];
-              let A = info[1];
-              let B = info[2];
-              let timestamp = r[2].toNumber();
+            let league = info[0];
+            let A = info[1];
+            let B = info[2];
+            let startTime = r[2].toNumber();
 
-              let dt = parseTimestamp(timestamp);
-              let hour = dt.hour
-              let noon = "AM";
+            let dt = parseTimestamp(startTime);
+            let noon = "AM";
+            let status;
 
-              if (dt.hour > 12){
-                dt.hour -= 12;
-                noon = "PM";
+            if (dt.hour > 12){
+              dt.hour -= 12;
+              noon = "PM";
+            }
+
+            let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
+
+            instance.isGameClose(id, function(e,r){
+              if (r) status = 3;
+              else {
+                status = getStatus(startTime);
               }
-
-              let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
-
               document.getElementById("game_table").innerHTML +=
                 `<tr>
                   <td>${id}</td>
                   <td>${league}</td>
                   <td style="font-weight:bold"><a href='home/game/${id}'>${A} : ${B}</a></td>
                   <td>${time}</td>
-                  <td><label class="label" style="background-color: #28a745; color:white">OPEN</label></td>
+                  <td><label class="label" style="background-color: ${gameStatusColor[status]}; color:white">${gameStatus[status]}</label></td>
                 </tr>`;
-            });
-          }
-        }
-      });
-    });
-  }
+            });//end isGameClose
+          });
+        }//end for
+      });//end getGames
+    });//end Toto.at
+  };//endinit
 
   </script>
 
@@ -351,7 +382,8 @@
               for (var i = 0; i < models.length; i++) {
                 options += `<option value="${models[i]['name']}">${models[i]['name']}</option>`;
               }
-              options += `<optgroup>`
+              options += `</
+              optgroup>`
               $("select#teamA_selected").html(options);
               $("select#teamB_selected").html(options);
 
@@ -371,7 +403,8 @@
         $("select#teamB").change(function(vent) {
           if ($(this).val() == -1) return;
         });
-      });
+      }
+    );
 
     // Select Teams
     function createGame() {
@@ -395,12 +428,6 @@
           if(e) console.log(e);
         });
       }
-      console.log(teamA);
-      console.log(teamB);
-      console.log(gameInfoStr);
-      console.log(game_date);
-      console.log(timestamp);
-      console.log(tokenAmount);
     }
 
   </script>
