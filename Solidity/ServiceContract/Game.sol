@@ -10,8 +10,6 @@ contract Game {
     address __main__;
 
 
-    event bettingLog(uint result, address addr, uint etherAmount, uint tokenAmount);
-    event verifyingLog(uint result, address addr, uint tokenAmount);
 
     modifier mainFunc {
       require(__main__ == msg.sender);
@@ -80,7 +78,6 @@ contract Game {
 
     resultStatus[3] resultStat;
 
-    event log(uint);
 
     // To decide compenstation ratio of each
     uint winnerEtherAmount = 0;       // Total Ether betted from winner - will be used to decide compensation ratio
@@ -118,8 +115,7 @@ contract Game {
         resultStat[result].totalEtherBetted += etherAmount;
         resultStat[result].totalTokenBetted += tokenAmount;
 
-        /* addrLog(resultStat[result][0].getAddr()); */
-        bettingLog(result, sender, etherAmount, tokenAmount);
+
     }
 
     function enterResult(address sender, uint tokenAmount, uint8 result) public mainFunc {
@@ -129,8 +125,7 @@ contract Game {
          resultStat[result].verifiers.push(verifier);
          resultStat[result].totalTokenFromVerifiers += tokenAmount;
 
-          /* addrLog(x.getAddr()); */
-          verifyingLog(result, verifier.addr, verifier.tokenAmount);
+
     }
 
     function getStartTime() public view  returns (uint) {
@@ -173,9 +168,9 @@ contract Game {
         rewardTokenPool += stat.totalTokenBetted + stat.totalTokenFromVerifiers;
       }
 
-      rewardCreators();
-      rewardParticipants();
-      rewardVerifier();
+      this.rewardCreators();
+      this.rewardParticipants();
+      this.rewardVerifier();
 
       close = true;
 
@@ -187,9 +182,10 @@ contract Game {
         1. Ether: etherPool * 0.1 * 0.1
         2. Tokens: Same amount with collateralized tokens
     */
-    event rewardCreatorLog(uint baseToken, uint rewardToken, uint rewardEther);
+
     function rewardCreators() public payable gameFunc {
         // 10% of etherForCompensation will be used for fee => 10% of it will be used to reward creators
+
         uint etherForCreators = (etherForCompensation * ETHER_POOL_FEE / 10) * ETHER_FEE_CREATOR / 10;
         uint tokenForCreators = rewardTokenPool * TOKEN_POOL_CREATOR / 10;
 
@@ -204,15 +200,12 @@ contract Game {
             // ethereum compensation for creators
             creators[i].addr.transfer(etherForCreators * creators[i].tokenAmount / creatorTokens);
 
-            rewardCreatorLog(creators[i].tokenAmount,
-                             tokenForCreators * creators[i].tokenAmount / creatorTokens,
-                             etherForCreators * creators[i].tokenAmount / creatorTokens);
+
         }
 
     }
 
-    event rewardWinnerLog(uint tokenAmount, uint etherAmount, uint rewardToken, uint rewardEther, uint additionalEther);
-    event rewardLoserLog(uint tokenAmount, uint rewardToken);
+
     function rewardParticipants() public payable gameFunc {
         Participant memory part;
         Participant[] memory winners;
@@ -237,12 +230,7 @@ contract Game {
              // Token compenstation for encouraging - propositional to the amount of token betted
              token.transferFrom(token, part.addr, tokenForWinners * part.tokenAmount / winnerTokenAmount );
 
-             rewardWinnerLog(part.tokenAmount,
-                             part.etherAmount,
-                             tokenForWinners * part.tokenAmount / winnerTokenAmount,
-                             ether95 * part.etherAmount / winnerEtherAmount,
-                             ether5 * part.tokenAmount / winnerTokenAmount
-                             );
+
           }
         }
 
@@ -256,7 +244,7 @@ contract Game {
              // Token compenstation for encouraging - propositional to the amount of token betted
              token.transferFrom(token, part.addr,tokenForLosers * part.tokenAmount / loserTokenAmount );
 
-             rewardLoserLog(part.tokenAmount, tokenForLosers * part.tokenAmount / loserTokenAmount);
+
            }
         }
 
@@ -291,7 +279,7 @@ contract Game {
         }
     }
 
-    function initDistribute(uint8 result) private gameFunc {
+    function initDistribute(uint8 result) private   {
         Participant memory part;
         Verifier memory ver;
 

@@ -12,7 +12,7 @@
       <div class="row">
         <div class="col-md-12">
           <table class="table">
-            <thead><h1 class="text-center text-primary">CREATE INFO</h1>
+            <thead><h1 class="text-center" style="font-weight:bold">CREATE INFO</h1>
               <tr>
                 <th>id</th>
                 <th>League</th>
@@ -28,9 +28,9 @@
         </div>
 
 
-        <div class = "col-md-12">
+        <div class = "col-md-12" style="margin-top:50px">
           <table class="table">
-            <thead><h1 class="text-center text-primary">BET INFO</h1>
+            <thead><h1 class="text-center" style="font-weight:bold">BET INFO</h1>
               <tr>
                 <th>id</th>
                 <th>League</th>
@@ -47,9 +47,9 @@
           </table>
         </div>
 
-        <div class = "col-md-12">
+        <div class = "col-md-12" style="margin-top:50px">
           <table class="table">
-            <thead><h1 class="text-center text-primary">VERIFY INFO</h1>
+            <thead><h1 class="text-center" style="font-weight:bold">VERIFY INFO</h1>
               <tr>
                 <th>id</th>
                 <th>League</th>
@@ -142,7 +142,7 @@
         let verifyInfo = r[2];
 
         for (let i=0; i<createInfo.length; i+=2){
-          let gid = verifyInfo[i].toNumber();
+          let gid = createInfo[i].toNumber();
 
           getGameInfo(games, gid).then(info => {
             document.getElementById("create_info").innerHTML +=
@@ -184,6 +184,10 @@
         }
       })
     })
+  }
+
+  function getLink(addr) {
+    return '<a target="_blank" href=https://testnet.etherscan.io/address/' + addr + '>' + addr +'</a>';
   }
 
 

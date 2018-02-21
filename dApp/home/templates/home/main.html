@@ -251,13 +251,11 @@
         if(e){ console.log(e); return; }
         if (games.length == 0) return;
 
-        games = games.reverse();
-
         for (let i=0; i<games.length; ++i){
           games[i] = Game.at(games[i]);
         }
 
-        for (let i=0; i<games.length; ++i){
+        for (let i=games.length-1; i>=0; --i){
           getGameInfo(games, i).then(info => {
             document.getElementById("game_table").innerHTML +=
               `<tr>

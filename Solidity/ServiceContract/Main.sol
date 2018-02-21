@@ -81,6 +81,7 @@ contract Main is Scottoken{
                  creatorInfo[tmpGame.creatorArray[i]].push(id);
                  creatorInfo[tmpGame.creatorArray[i]].push(tmpGame.tokenArray[i]);
              }
+             id++;
         }
 
         return games;
@@ -162,20 +163,7 @@ contract Main is Scottoken{
         return (now > start + PLAYING_TIME + RESULT_TIME);
     }
 
-    event balanceLog(address addr, uint etherBalance, uint tokenBalance);
-    /* function logBalance(){
-        address addr1 = 0xca35b7d915458ef540ade6068dfe2f44e8fa733c;
-        address addr2 = 0x14723a09acff6d2a60dcdf7aa4aff308fddc160c;
-        address addr3 = 0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db;
-        address addr4 = 0x583031d1113ad414f02576bd6afabfb302140225;
-        address addr5 = 0xdd870fa1b7c4700f2bd7f44238821c26f7392148;
 
-        balanceLog(addr1, addr1.balance, balanceOf(addr1));
-        balanceLog(addr2, addr2.balance, balanceOf(addr2));
-        balanceLog(addr3, addr3.balance, balanceOf(addr3));
-        balanceLog(addr4, addr4.balance, balanceOf(addr4));
-        balanceLog(addr5, addr5.balance, balanceOf(addr5));
-    } */
 
 
 
