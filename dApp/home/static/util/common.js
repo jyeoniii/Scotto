@@ -1,3 +1,5 @@
+var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSE"];
+var gameStatusColor = ["#28a745", "#8A2BE2",	"#FFA500", "	#DB7093", "#B22222"];
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -18,9 +20,48 @@ window.addEventListener('load', function() {
 web3.eth.getAccounts(function(e,r){
   if (r.length > 0){
     document.getElementById('accountAddr').innerHTML += r[0];
-    
+
 
   }
   else
     document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
 });
+
+function getGameInfoTds(gid, league, A_B_DRAW, time, status) {
+  return `<td>${gid}</td>
+          <td>${league}</td>
+          <td style="font-weight:bold"><a href='/home/game/${gid}'>${A_B_DRAW[0]} : ${A_B_DRAW[1]}</a></td>
+          <td>${time}</td>
+          <td><label class="label" style="background-color: ${gameStatusColor[status]}; color:white">${gameStatus[status]}</label></td>`;;
+}
+
+function getGameInfo(games, gid){
+  return new Promise(function(resolve, reject) {
+    games[gid].getGameInfo(function(e,r) {
+      let gameStr = r[1];
+      let info = gameStr.split(":");
+
+      let league = info[0];
+      let A_B_DRAW = [info[1], info[2], 'DRAW'];
+      let startTime = r[2].toNumber();
+
+      let dt = parseTimestamp(startTime);
+      let noon = "AM";
+      let status;
+
+      if (dt.hour > 12){
+        dt.hour -= 12;
+        noon = "PM";
+      }
+
+      let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
+
+      toto.isGameClosed(gid, function(e,r){
+        if (r) status = 3;
+        else status = getStatus(startTime);
+
+        resolve([league, A_B_DRAW, time, status, startTime]);
+      });//end isGameClosed
+    }); //end getGameInfo
+  }); //end Promise
+}

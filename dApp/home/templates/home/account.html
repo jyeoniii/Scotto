@@ -2,14 +2,13 @@
 {% load static %}
 
 {% block head_content %}
-  <!-- Style for Datetime picker -->
-  <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
 {% endblock head_content %}
 
 {% block body_content %}
 
-  <!-- Header -->
+
     <div class="container py-5">
+
 
 
   <!-- Table -->
@@ -18,12 +17,14 @@
       <div class="row">
         <div class="col-md-12">
           <table class="table">
-            <thead><h1>CREATE INFO</h1>
+            <thead><h1 class="text-center" style="font-weight:bold">CREATE INFO</h1>
               <tr>
                 <th>id</th>
-
+                <th>League</th>
+                <th>Game</th>
+                <th>Start Time</th>
+                <th>Status</th>
                 <th>SCT Amount</th>
-
               </tr>
             </thead>
             <tbody id="create_info">
@@ -32,140 +33,174 @@
         </div>
 
 
-        <div class = "col-md-12">
+        <div class = "col-md-12" style="margin-top:50px">
           <table class="table">
-            <thead><h1>BET INFO</h1>
+            <thead><h1 class="text-center" style="font-weight:bold">BET INFO</h1>
               <tr>
                 <th>id</th>
-                <th>result</th>
+                <th>League</th>
+                <th>Game</th>
+                <th>Start Time</th>
+                <th>Status</th>
+                <th>Result</th>
                 <th>ETH Amount</th>
                 <th>SCT Amount</th>
-
               </tr>
             </thead>
-
             <tbody id="betting_info">
             </tbody>
-
           </table>
         </div>
-      </div>
-    </div>
-  </div>
 
-    <div class="container">
-      <div class="row">
-          <div class = "col-md-12">
-
+        <div class = "col-md-12" style="margin-top:50px">
           <table class="table">
-            <thead><h1>VERIFY INFO</h1>
+            <thead><h1 class="text-center" style="font-weight:bold">VERIFY INFO</h1>
               <tr>
                 <th>id</th>
-                <th>result</th>
+                <th>League</th>
+                <th>Game</th>
+                <th>Start Time</th>
+                <th>Status</th>
+                <th>Result</th>
                 <th>SCT Amount</th>
-
-
               </tr>
             </thead>
-
             <tbody id="verifying_info">
             </tbody>
-
-
           </table>
         </div>
       </div>
 
+
+
+    </div>
   </div>
-      </div>
-
-
-
-
-
+</div>
 
 {% endblock body_content %}
 
 {% block script_content %}
 
-  
 
   <!-- Datetime picker -->
   <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
-  <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
-  <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
 
   <script>
   // Script related to web3
 
   var games;
+  var accountAddr;
+  var toto;
+
   function init(){
 
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
 
+    createInstance()
+      .then(getGames)
+      .then(getAccount)
+      .then(getTableContents) // end accountInfo
 
-    Toto.at(contractAddress, function(e, instance) {
-      if(instance){
-      toto = instance;
+  }
 
-      web3.eth.getAccounts(function(e,r){
-        if (r.length > 0){
-          instance.accountInfo(r[0],
-            function(e, r){
+  function createInstance() {
+    return new Promise(function(resolve, reject) {
+      Toto.at(contractAddress, function(e, instance) {
+        toto = instance;
+        resolve(toto);
+      })
+    });
+  }
 
-              for(var i = 0 ; i < r[0].length; i = i + 2){
-                document.getElementById("create_info").innerHTML +=
-                  `<tr>
-                    <td>${r[0][i]}</td>
-                      <td>${r[0][i+1]}</td>
+  function getAccount(){
+    return new Promise(function(resolve, reject){
+      web3.eth.getAccounts(function(e,r) {
+        if(e) console.log(e);
 
-                  </tr>`;
-              }
+        else if (r.length > 0) { accountAddr = r[0]; resolve(accountAddr) }
+        else alert('Please login to metamask first!');
 
-              for(var i = 0 ; i < r[1].length; i = i + 4){
-                document.getElementById("betting_info").innerHTML +=
-                  `<tr>
-                    <td>${r[1][i]}</td>
-                      <td>${r[1][i+1]}</td>
-                      <td>${r[1][i+2]}</td>
-                        <td>${r[1][i+3]}</td>
-                  </tr>`;
-              }
-              for(var i = 0 ; i < r[2].length; i = i + 3){
-                document.getElementById("verifying_info").innerHTML +=
-                  `<tr>
-                    <td>${r[2][i]}</td>
-                      <td>${r[2][i+1]}</td>
-                      <td>${r[2][i+2]}</td>
+      });
+    });
+  }
 
-                  </tr>`;
-              }
+  function getGames() {
+    return new Promise(function(resolve, reject){
+      toto.getGames(function(e,r) {
+        if (e) console.log(e);
+        else {
+          games = r;
+          for (var i=0; i<games.length; ++i){
+            games[i] = Game.at(games[i]);
+          }
+          resolve(games);
+        }
+      });
+    });
+  }
+
+  function getTableContents() {
+    return new Promise(function(resolve, reject){
+      toto.accountInfo(accountAddr, function(e, r){
+        if (e) console.log(e);
+
+        let createInfo = r[0];
+        let partInfo = r[1];
+        let verifyInfo = r[2];
+
+        for (let i=0; i<createInfo.length; i+=2){
+          let gid = createInfo[i].toNumber();
+
+          getGameInfo(games, gid).then(info => {
+            document.getElementById("create_info").innerHTML +=
+                `<tr>
+                  ${getGameInfoTds(gid, info[0], info[1], info[2], info[3])}
+                  <td>${createInfo[i+1]} SCT</td>
+                </tr>`;
+          })
+
+        }
+
+        for(let i = 0 ; i < partInfo.length; i = i + 4){
+          let gid = partInfo[i].toNumber();
+          let rid = partInfo[i+1].toNumber();
+
+          getGameInfo(games, gid).then(info => {
+            document.getElementById("betting_info").innerHTML +=
+                `<tr>
+                  ${getGameInfoTds(gid, info[0], info[1], info[2], info[3])}
+                  <td>${info[1][rid]}</td>
+                  <td>${web3.fromWei(partInfo[i+2],'ether')} ETH</td>
+                  <td>${partInfo[i+3]} SCT</td>
+                </tr>`;
+          })
+        }
+
+        for(let i = 0 ; i < verifyInfo.length; i = i + 3){
+            let gid = verifyInfo[i].toNumber();
+            let rid = verifyInfo[i+1].toNumber();
+
+            getGameInfo(games, gid).then(info => {
+              document.getElementById("verifying_info").innerHTML +=
+                `<tr>
+                  ${getGameInfoTds(gid, info[0], info[1], info[2], info[3])}
+                  <td>${info[1][rid]}</td>
+                  <td>${verifyInfo[i+2]} SCT</td>
+                </tr>`;
             })
-        }})
+        }
+      })
+    })
+  }
 
-
-      }
-
-
-
-  })
-}
-  </script>
+  function getLink(addr) {
+    return '<a target="_blank" href=https://testnet.etherscan.io/address/' + addr + '>' + addr +'</a>';
+  }
 
 
 
+</script>
 
 {% endblock script_content %}
-
-{% block style_content %}
-<style>
-  label {
-    border-radius:.25em; font-weight:700; font-size:75%;padding-top: 0.2em;
-    padding-right: 0.6em;
-    padding-bottom: 0.3em;
-    padding-left: 0.6em;
-  }
-</style>
-{% endblock style_content %}
