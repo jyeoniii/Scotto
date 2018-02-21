@@ -136,68 +136,49 @@
     return new Promise(function(resolve, reject){
       toto.accountInfo(accountAddr, function(e, r){
         if (e) console.log(e);
+
         let createInfo = r[0];
         let partInfo = r[1];
         let verifyInfo = r[2];
 
-        for (var i=0; i<createInfo.length; i+=2){
-          let idx = i;
+        for (let i=0; i<createInfo.length; i+=2){
           let gid = verifyInfo[i].toNumber();
 
-          getGameInfo(gid).then(info => {
-            let league = info[0];
-            let A_B_DRAW = info[1];
-            let time = info[2];
-            let status = info[3];
-
+          getGameInfo(games, gid).then(info => {
             document.getElementById("create_info").innerHTML +=
                 `<tr>
-                  ${getGameInfoTds(gid, league, A_B_DRAW, time, status)}
-                  <td>${createInfo[idx+1]} SCT</td>
+                  ${getGameInfoTds(gid, info[0], info[1], info[2], info[3])}
+                  <td>${createInfo[i+1]} SCT</td>
                 </tr>`;
           })
 
         }
 
-        for(var i = 0 ; i < partInfo.length; i = i + 4){
-          let idx = i;
+        for(let i = 0 ; i < partInfo.length; i = i + 4){
           let gid = partInfo[i].toNumber();
           let rid = partInfo[i+1].toNumber();
 
-          getGameInfo(gid).then(info => {
-            let league = info[0];
-            let A_B_DRAW = info[1];
-            let time = info[2];
-            let status = info[3];
-            let result = A_B_DRAW[rid];
-
+          getGameInfo(games, gid).then(info => {
             document.getElementById("betting_info").innerHTML +=
                 `<tr>
-                  ${getGameInfoTds(gid, league, A_B_DRAW, time, status)}
-                  <td>${result}</td>
-                  <td>${web3.fromWei(partInfo[idx+2],'ether')} ETH</td>
-                  <td>${partInfo[idx+3]} SCT</td>
+                  ${getGameInfoTds(gid, info[0], info[1], info[2], info[3])}
+                  <td>${info[1][rid]}</td>
+                  <td>${web3.fromWei(partInfo[i+2],'ether')} ETH</td>
+                  <td>${partInfo[i+3]} SCT</td>
                 </tr>`;
           })
         }
 
-        for(var i = 0 ; i < verifyInfo.length; i = i + 3){
-            let idx = i;
+        for(let i = 0 ; i < verifyInfo.length; i = i + 3){
             let gid = verifyInfo[i].toNumber();
             let rid = verifyInfo[i+1].toNumber();
 
-            getGameInfo(gid).then(info => {
-              let league = info[0];
-              let A_B_DRAW = info[1];
-              let time = info[2];
-              let status = info[3];
-              let result = A_B_DRAW[rid];
-
+            getGameInfo(games, gid).then(info => {
               document.getElementById("verifying_info").innerHTML +=
                 `<tr>
-                  ${getGameInfoTds(gid, league, A_B_DRAW, time, status)}
-                  <td>${result}</td>
-                  <td>${verifyInfo[idx+2]} SCT</td>
+                  ${getGameInfoTds(gid, info[0], info[1], info[2], info[3])}
+                  <td>${info[1][rid]}</td>
+                  <td>${verifyInfo[i+2]} SCT</td>
                 </tr>`;
             })
         }
@@ -205,44 +186,7 @@
     })
   }
 
-  function getGameInfoTds(gid, league, A_B_DRAW, time, status) {
-    return `<td>${gid}</td>
-            <td>${league}</td>
-            <td style="font-weight:bold"><a href='/home/game/${gid}'>${A_B_DRAW[0]} : ${A_B_DRAW[1]}</a></td>
-            <td>${time}</td>
-            <td><label class="label" style="background-color: ${gameStatusColor[status]}; color:white">${gameStatus[status]}</label></td>`;;
-  }
 
-  function getGameInfo(gid){
-    return new Promise(function(resolve, reject) {
-      games[gid].getGameInfo(function(e,r) {
-        let gameStr = r[1];
-        let info = gameStr.split(":");
-
-        let league = info[0];
-        let A_B_DRAW = [info[1], info[2], 'DRAW'];
-        let startTime = r[2].toNumber();
-
-        let dt = parseTimestamp(startTime);
-        let noon = "AM";
-        let status;
-
-        if (dt.hour > 12){
-          dt.hour -= 12;
-          noon = "PM";
-        }
-
-        let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
-
-        toto.isGameClosed(gid, function(e,r){
-          if (r) status = 3;
-          else status = getStatus(startTime);
-
-          resolve([league, A_B_DRAW, time, status]);
-        });//end isGameClosed
-      }); //end getGameInfo
-    }); //end Promise
-  }
 
 </script>
 

@@ -238,6 +238,7 @@
   // Script related to web3
 
   var games;
+
   function init(){
     Toto = web3.eth.contract(mainAbi);
     Game = web3.eth.contract(gameAbi);
@@ -250,50 +251,19 @@
         if(e){ console.log(e); return; }
         if (games.length == 0) return;
 
-        for (var i=0; i<games.length; ++i){
+        games = games.reverse();
+
+        for (let i=0; i<games.length; ++i){
           games[i] = Game.at(games[i]);
         }
 
-        games = games.reverse();
-
-        for (var i=0; i<games.length; ++i){
-          games[i].getGameInfo(function(e,r) {
-            let id = r[0].toNumber();
-
-            let gameStr = r[1];
-            let info = gameStr.split(":");
-
-            let league = info[0];
-            let A = info[1];
-            let B = info[2];
-            let startTime = r[2].toNumber();
-
-            let dt = parseTimestamp(startTime);
-            let noon = "AM";
-            let status;
-
-            if (dt.hour > 12){
-              dt.hour -= 12;
-              noon = "PM";
-            }
-
-            let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
-
-            instance.isGameClosed(id, function(e,r){
-              if (r) status = 3;
-              else {
-                status = getStatus(startTime);
-              }
-              document.getElementById("game_table").innerHTML +=
-                `<tr>
-                  <td>${id}</td>
-                  <td>${league}</td>
-                  <td style="font-weight:bold"><a href='/home/game/${id}'>${A} : ${B}</a></td>
-                  <td>${time}</td>
-                  <td><label class="label" style="background-color: ${gameStatusColor[status]}; color:white">${gameStatus[status]}</label></td>
-                </tr>`;
-            });//end isGameClosed
-          });
+        for (let i=0; i<games.length; ++i){
+          getGameInfo(games, i).then(info => {
+            document.getElementById("game_table").innerHTML +=
+              `<tr>
+                ${getGameInfoTds(i, info[0], info[1], info[2], info[3])}
+              </tr>`;
+          })// end getGameInfo
         }//end for
       });//end getGames
     });//end Toto.at
@@ -316,18 +286,6 @@
     showMeridian: 1,
     });
 
-    var leagues;
-
-    function changeLeague() {
-      console.log(leagues);
-      var selectedLeague = document.getElementById("teamA_selected");
-      var request_url = `/home/changeLeague/${selectedLeague}`;
-
-      // var opts = document.getElementById("teamA_options").innerHTML += leagues[league_Selected];
-      // `<option>${d}</option>`
-      // var league_games = document.getElementById("teams").value;
-
-    }
 
     $(document).ready(
       function() {
@@ -338,15 +296,14 @@
             $("select#teamB_selected").attr('disabled', true);
           }
           else {
-            var url = "/home/league/" + $(this).val().replace(" ", "_") + "/all_json_models";
-            var team = $(this).val();
+            let url = "/home/league/" + $(this).val().replace(" ", "_") + "/all_json_models";
+            let team = $(this).val();
             $.getJSON(url, function(models) {
-              var options = '<optgroup label="Team"><option value="Z" disabled selected hidden>Team</option>';
-              for (var i = 0; i < models.length; i++) {
+              let options = '<optgroup label="Team"><option value="Z" disabled selected hidden>Team</option>';
+              for (let i = 0; i < models.length; i++) {
                 options += `<option value="${models[i]['name']}">${models[i]['name']}</option>`;
               }
-              options += `</
-              optgroup>`
+              options += `</optgroup>`
               $("select#teamA_selected").html(options);
               $("select#teamB_selected").html(options);
 
@@ -371,20 +328,20 @@
 
     // Select Teams
     function createGame() {
-      var league_opt = document.getElementById('league_selected');
-      var teamA_opt = document.getElementById('teamA_selected');
-      var teamB_opt = document.getElementById('teamB_selected');
+      let league_opt = document.getElementById('league_selected');
+      let teamA_opt = document.getElementById('teamA_selected');
+      let teamB_opt = document.getElementById('teamB_selected');
 
-      var league = league_opt[league_opt.selectedIndex].value;
-      var teamA = teamA_opt[teamA_opt.selectedIndex].value;
-      var teamB = teamB_opt[teamB_opt.selectedIndex].value;
+      let league = league_opt[league_opt.selectedIndex].value;
+      let teamA = teamA_opt[teamA_opt.selectedIndex].value;
+      let teamB = teamB_opt[teamB_opt.selectedIndex].value;
 
-      var tokenAmount = document.getElementById('create_token_amount').value;
+      let tokenAmount = document.getElementById('create_token_amount').value;
 
-      var game_date = $('.form_datetime').data('datetimepicker').getDate();
-      var timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
+      let game_date = $('.form_datetime').data('datetimepicker').getDate();
+      let timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
 
-      var gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
+      let gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
 
 
       if (confirm(`Are you sure you want to create this game?\n

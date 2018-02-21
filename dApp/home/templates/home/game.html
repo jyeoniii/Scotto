@@ -208,67 +208,48 @@
 
     Toto.at(contractAddress, function(e, instance) {
       toto = instance;
-      instance.getGames(function(e,r){
+      instance.getGames(function(e,games){
         if(e) {
           console.log(e);
           return;
         }
-        if (gid > r.length) console.log("Unexisting Game");  // TODO: 404 error handling
-        let gameAddr = r[gid];
+        if (gid > games.length) console.log("Unexisting Game");  // TODO: 404 error handling
+        let gameAddr = games[gid];
 
         game = Game.at(gameAddr);
-        getGameInfo();
+        games[gid] = game;
+        showGameInfo(games, gid);
         getBettingInfo();
       });
 
     });
   }
 
-  function getGameInfo() {
-    game.getGameInfo(function(e,r) {
-      let gameStr = r[1];
-      let info = gameStr.split(":");
-
+  function showGameInfo(games, gid) {
+    getGameInfo(games, gid).then(info => {
       let league = info[0];
-      let A = info[1];
-      let B = info[2];
-
-      let startTime = r[2].toNumber();
-
-      let dt = parseTimestamp(startTime);
-      let hour = dt.hour;
-      let noon = "AM";
-
-      if (dt.hour > 12){
-        dt.hour -= 12;
-        noon = "PM";
-      }
-
-      let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`
+      let A_B_DRAW = info[1];
+      let time = info[2];
+      let status = info[3];
+      let startTime = info[4];
 
       let teamA_elements = document.getElementsByName("teamA");
       let teamB_elements = document.getElementsByName("teamB");
 
       for (var i=0; i<teamA_elements.length; ++i){
-        teamA_elements[i].innerHTML = A;
+        teamA_elements[i].innerHTML = A_B_DRAW[0];
       }
 
       for (var i=0; i<teamB_elements.length; ++i){
-        teamB_elements[i].innerHTML = B;
+        teamB_elements[i].innerHTML = A_B_DRAW[1];
       }
 
       document.getElementById("league").innerHTML = league;
       document.getElementById("time").innerHTML = time;
 
-      toto.isGameClosed(gid, function(e,r) {
-        if (r) status = 4;
-        else {
-          status = getStatus(startTime);
-          changeTemplateStatus(status, startTime);
-        }
-      })
 
-    });
+      changeTemplateStatus(status, startTime);
+    })
   }
 
   function changeTemplateStatus(status, startTime) {
