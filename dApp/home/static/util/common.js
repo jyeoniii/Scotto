@@ -1,5 +1,6 @@
-var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSE"];
+var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSED"];
 var gameStatusColor = ["#28a745", "#8A2BE2",	"#FFA500", "	#DB7093", "#B22222"];
+var accountAddr;
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -20,8 +21,6 @@ window.addEventListener('load', function() {
 web3.eth.getAccounts(function(e,r){
   if (r.length > 0){
     document.getElementById('accountAddr').innerHTML += r[0];
-
-
   }
   else
     document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
@@ -57,7 +56,7 @@ function getGameInfo(games, gid){
       let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
 
       toto.isGameClosed(gid, function(e,r){
-        if (r) status = 3;
+        if (r) status = 4;
         else status = getStatus(startTime);
 
         resolve([league, A_B_DRAW, time, status, startTime]);
