@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from .models import League, Team
+from .models import *
 from django.forms.models import model_to_dict
 from django.http import HttpResponse,JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 # Create your views here.
 
@@ -32,3 +33,67 @@ def all_json_models(request, league):
     teams_dict.append(model_to_dict(t))
 
   return JsonResponse(teams_dict, safe=False)
+
+@ensure_csrf_cookie
+def putCreateInfo(request):
+  try:
+    addr = request.POST.get('addr')
+    account = Account.objects.get_or_create(addr=addr)[0]
+  
+    txid = request.POST.get('txid')
+    league = request.POST.get('league')
+    teamA = request.POST.get('teamA')
+    teamB = request.POST.get('teamB')
+    startTime = request.POST.get('startTimeStamp')
+  except KeyError:
+    print("Faild to create txinfo")
+    return HttpResponse(status=304)
+
+  Transaction.objects.create(sender=account, txid=txid, txtype='CREATE',
+                             league=league, teamA=teamA, teamB=teamB, startTime=startTime)
+
+  return HttpResponse(status=200)
+
+@ensure_csrf_cookie
+def putBetInfo(request):
+  try:
+    addr = request.POST.get('addr')
+    account = Account.objects.get_or_create(addr=addr)[0]
+  
+    txid = request.POST.get('txid')
+    league = request.POST.get('league')
+    teamA = request.POST.get('teamA')
+    teamB = request.POST.get('teamB')
+    startTime = request.POST.get('startTimeStamp')
+  except KeyError:
+    print("Faild to create txinfo")
+    return HttpResponse(status=304)
+
+  Transaction.objects.create(sender=account, txid=txid, txtype='BET',
+                             league=league, teamA=teamA, teamB=teamB, startTime=startTime)
+
+  return HttpResponse(status=200)
+
+@ensure_csrf_cookie
+def putVerifyInfo(request):
+  try:
+    addr = request.POST.get('addr')
+    account = Account.objects.get_or_create(addr=addr)[0]
+
+    txid = request.POST.get('txid')
+    league = request.POST.get('league')
+    teamA = request.POST.get('teamA')
+    teamB = request.POST.get('teamB')
+    startTime = request.POST.get('startTimeStamp')
+  except KeyError:
+    print("Faild to create txinfo")
+    return HttpResponse(status=304)
+
+  Transaction.objects.create(sender=account, txid=txid, txtype='VERIFY',
+                             league=league, teamA=teamA, teamB=teamB, startTime=startTime)
+
+  return HttpResponse(status=200)
+
+
+
+

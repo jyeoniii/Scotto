@@ -7,6 +7,7 @@
 {% endblock head_content %}
 
 {% block body_content %}
+  {% csrf_token %}
 
   <!-- Header -->
   <div class="py-5 text-center h-100" style="background-image: url(&quot;http://wallpaper-gallery.net/images/soccer-wallpapers/soccer-wallpapers-7.jpg&quot;);">
@@ -233,6 +234,27 @@
   <script type="text/javascript" src='{% static "datetimepicker/bootstrap/js/bootstrap.min.js" %}'></script>
   <script type="text/javascript" src='{% static "datetimepicker/js/bootstrap-datetimepicker.js" %}' charset="UTF-8"></script>
   <script type="text/javascript" src='{% static "datetimepicker/js/locales/bootstrap-datetimepicker.es.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "util/jquery.cookie.js" %}'></script>
+
+  <script>
+  // Script related to ajax & csrf token
+
+  var csrftoken = $.cookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+
+  </script>
 
   <script>
   // Script related to web3
@@ -334,23 +356,52 @@
       let teamA = teamA_opt[teamA_opt.selectedIndex].value;
       let teamB = teamB_opt[teamB_opt.selectedIndex].value;
 
+      if (league==="Z"){
+        alert("Please choose a league!");
+        return;
+      } else if (teamA === "Z" || teamB === "Z"){
+        alert("Please choose a team!");
+        return;
+      }
+
       let tokenAmount = document.getElementById('create_token_amount').value;
 
       let game_date = $('.form_datetime').data('datetimepicker').getDate();
       let timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
 
       let gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
+      let hour = game_date.getDate();
 
+      let noon = "AM";
+
+      if (hour > 12){
+        hour -= 12;
+        noon = "PM";
+      }
+
+      let startDateStr = `${game_date.getFullYear()}/${game_date.getMonth()+1}/${game_date.getDate()} - ${noon} ${hour}:${game_date.getMinutes()}`;
 
       if (confirm(`Are you sure you want to create this game?\n
                   ${league} - ${teamA} vs ${teamB}
-                  ${game_date.getFullYear()}/${game_date.getMonth()+1}/${game_date.getDate()} ${game_date.getHours()}:${game_date.getMinutes()}`) &&
-          toto != undefined) {
-        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){
+                  ${startDateStr}`) && toto != undefined) {
+        toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,txid){
           if(e) console.log(e);
-          else alert("Successfully voted to create a game!")
-        });
-      }
+          else {
+            alert("Successfully voted to create a game!")
+            $.ajax({
+               type: "POST",
+               url: "/home/putDB/create",
+               data: {"txid":txid,
+                      "addr": accountAddr,
+                      "league":league,"teamA":teamA, "teamB":teamB,
+                      "startTimeStamp":timestamp,
+                },
+                dataType: 'json',
+               success: function() { console.log('Successfully put create Info into DB')}
+            }); // end ajax
+          } //end else
+        }); // end toto.createGame
+      } //endif
     }
 
   </script>
