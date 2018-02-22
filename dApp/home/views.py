@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import *
 from django.forms.models import model_to_dict
-from django.http import HttpResponse,JsonResponse
+from django.http import HttpResponse,JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 # Create your views here.
@@ -15,8 +15,11 @@ def game(request, id):
   return render(request, 'home/game.html', {"gid":id})
 
 
-def account(request):
-    return render(request, 'home/account.html')
+def account(request, addr):
+  account = Account.objects.get(addr=addr)
+  txs = Transaction.objects.filter(sender=account)
+  print(txs)
+  return render(request, 'home/account.html', {"txs":txs})
 
 def get_league_list():
   league_list = League.objects.all()
@@ -36,6 +39,8 @@ def all_json_models(request, league):
 
 @ensure_csrf_cookie
 def putCreateInfo(request):
+  if not request.is_ajax:
+    return HttpResponseNotAllowed()
   try:
     addr = request.POST.get('addr')
     account = Account.objects.get_or_create(addr=addr)[0]
@@ -56,6 +61,8 @@ def putCreateInfo(request):
 
 @ensure_csrf_cookie
 def putBetInfo(request):
+  if not request.is_ajax:
+    return HttpResponseNotAllowed()
   try:
     addr = request.POST.get('addr')
     account = Account.objects.get_or_create(addr=addr)[0]
@@ -76,6 +83,8 @@ def putBetInfo(request):
 
 @ensure_csrf_cookie
 def putVerifyInfo(request):
+  if not request.is_ajax:
+    return HttpResponseNotAllowed()
   try:
     addr = request.POST.get('addr')
     account = Account.objects.get_or_create(addr=addr)[0]

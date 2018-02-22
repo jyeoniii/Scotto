@@ -295,17 +295,29 @@
   <script type="text/javascript">
 
     // datetimepicker
-    $('.form_datetime').datetimepicker({
-        //language:  'fr',
-    weekStart: 1,
-    todayBtn:  1,
-  	autoclose: 1,
-  	todayHighlight: 1,
-  	startView: 2,
-  	forceParse: 0,
-    showMeridian: 1,
-    });
+    $(function() {
+      var minDate = new Date();
+      var maxDate = new Date();
+      let CREATE_MAX = 7;
+      let CREATE_MIN = 4;
+      minDate.setDate(minDate.getDate() + CREATE_MIN)
+      maxDate.setDate(maxDate.getDate() + CREATE_MAX);
 
+      console.log(minDate);
+      console.log(maxDate);
+
+      $('.form_datetime').datetimepicker({
+        startDate: minDate,
+        endDate: maxDate,
+        weekStart: 1,
+        todayBtn:  1,
+      	autoclose: 1,
+      	todayHighlight: 1,
+      	startView: 2,
+      	forceParse: 0,
+        showMeridian: 1,
+      });
+    });
 
     $(document).ready(
       function() {
@@ -362,9 +374,20 @@
       } else if (teamA === "Z" || teamB === "Z"){
         alert("Please choose a team!");
         return;
+      } else if (teamA === teamB) {
+        alert("Please choose different teams!");
+        return;
       }
 
+      // Sort team A and team B in alphabetic order
+      let teams = [teamA, teamB].sort()
+      teamA = teams[0]; teamB = teams[1];
+
       let tokenAmount = document.getElementById('create_token_amount').value;
+      if (tokenAmount <= 0){
+        alert('Token amount should be greater than 0!');
+        return;
+      }
 
       let game_date = $('.form_datetime').data('datetimepicker').getDate();
       let timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
@@ -383,9 +406,12 @@
 
       if (confirm(`Are you sure you want to create this game?\n
                   ${league} - ${teamA} vs ${teamB}
-                  ${startDateStr}`) && toto != undefined) {
+                  ${startDateStr}, ${tokenAmount} SCT`) && toto != undefined) {
         toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,txid){
-          if(e) console.log(e);
+          if(e) {
+            console.log(e);
+            alert('Failed to create a game! (Please check if you have valid token amount, or checkt if the start date is within 7-4 days from current date)')
+          }
           else {
             alert("Successfully voted to create a game!")
             $.ajax({

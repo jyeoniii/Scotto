@@ -31,7 +31,6 @@ contract Main is Scottoken{
     uint private constant MIN_CREATORS = 1;
     uint private constant CREATE_START = 7 days;
     uint private constant CREATE_PERIOD = 4 days;
-    uint private constant BETTING_TIME = 3 days;
     uint private constant PLAYING_TIME = 3 hours;
     uint private constant RESULT_TIME = 18 hours;
 
@@ -150,7 +149,7 @@ contract Main is Scottoken{
 
     function isBettingTime(Game game) private view returns (bool){
         uint start = game.getStartTime();
-        return (now < start && now > start - BETTING_TIME);
+        return (now < start);
     }
 
     function isResultTime(Game game) private view returns (bool){
