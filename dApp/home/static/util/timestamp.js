@@ -13,7 +13,7 @@ var ORIGIN_YEAR = 1970;
 // var PLAYTING_TIME = 3 * HOUR_IN_SECONDS;
 // var RESULT_TIME = 18 * HOUR_IN_SECONDS;
 
-var PLAYTING_TIME = 60;
+var PLAYING_TIME = 60;
 var RESULT_TIME = 60;
 function isLeapYear(year) {
   if (year % 4 != 0) {
@@ -92,6 +92,7 @@ function getYear(timestamp) {
   var secondsAccountedFor = 0;
   var year;
   var numLeapYears;
+  timestamp -= 9 * HOUR_IN_SECONDS;
   // Year
   year = parseInt(ORIGIN_YEAR + timestamp / YEAR_IN_SECONDS);
   numLeapYears = leapYearsBefore(year) - leapYearsBefore(ORIGIN_YEAR);
@@ -115,15 +116,19 @@ function getDay(timestamp) {
   return parseTimestamp(timestamp).day;
 }
 function getHour(timestamp) {
+  timestamp -= 9 * HOUR_IN_SECONDS;
   return parseInt(timestamp / 60 / 60) % 24;
 }
 function getMinute(timestamp) {
+  timestamp -= 9 * HOUR_IN_SECONDS;
   return parseInt(timestamp / 60) % 60;
 }
 function getSecond(timestamp) {
+  timestamp -= 9 * HOUR_IN_SECONDS;
   return timestamp % 60;
 }
 function getWeekday(timestamp) {
+  timestamp -= 9 * HOUR_IN_SECONDS;
   return parseInt(timestamp / DAY_IN_SECONDS + 4) % 7;
 }
 
@@ -158,7 +163,7 @@ function toTimestamp(year, month, day, hour, minute, second) {
   // Second
   timestamp += second;
 
-  return timestamp ;
+  return timestamp - 9 * HOUR_IN_SECONDS;
 }
 
 function getStatus(startTime){

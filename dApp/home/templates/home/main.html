@@ -11,6 +11,7 @@
 {% endblock head_content %}
 
 {% block body_content %}
+  <input type="hidden" id="minSCT">
 
   <!-- Header -->
     <div class="container py-5">
@@ -63,7 +64,7 @@
 				         <input type="hidden" id="dtp_input1" value="" /><br/>
            </form>
            <!-- Token Amount -->
-           <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="No. SCT">
+           <input class="form-control col-md-2" type="number" id="create_token_amount" min="0" max="100" placeholder="SCT">
           </div>
           <button class="col-md-6 btn btn-lg btn-primary" onclick="createGame()" style="font-weight:bold">Submit</button>
 
@@ -287,6 +288,11 @@
           })// end getGameInfo
         }//end for
       });//end getGames
+      instance.getCirculate(function(e,circSCT) {
+        let minSCT = circSCT * 0.025;
+        document.getElementById("minSCT").value = minSCT;
+        document.getElementById("create_token_amount").placeholder += ` (min: ${minSCT})`;
+      });
     });//end Toto.at
   };//endinit
 
@@ -304,8 +310,6 @@
       minDate.setDate(minDate.getDate() + CREATE_MIN)
       maxDate.setDate(maxDate.getDate() + CREATE_MAX);
 
-      console.log(minDate);
-      console.log(maxDate);
 
       $('.form_datetime').datetimepicker({
         startDate: minDate,
@@ -385,8 +389,9 @@
       teamA = teams[0]; teamB = teams[1];
 
       let tokenAmount = document.getElementById('create_token_amount').value;
-      if (tokenAmount <= 0){
-        alert('Token amount should be greater than 0!');
+      let minSCT = document.getElementById("minSCT").value;
+      if (tokenAmount < minSCT){
+        alert(`Token amount should be greater than ${minSCT}!`);
         return;
       }
 
@@ -394,7 +399,7 @@
       let timestamp = toTimestamp(game_date.getFullYear(), game_date.getMonth()+1, game_date.getDate(), game_date.getHours(), game_date.getMinutes(), 0);
 
       let gameInfoStr = league + ":" + teamA + ":" + teamB + ":" + timestamp.toString();
-      let hour = game_date.getDate();
+      let hour = game_date.getHours();
 
       let noon = "AM";
 
@@ -411,7 +416,8 @@
         toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,txid){
           if(e) {
             console.log(e);
-            alert('Failed to create a game! (Please check if you have valid token amount, or checkt if the start date is within 7-4 days from current date)')
+            console.log(timestamp);
+            alert('Failed to create a game! (Please check if you have valid token amount, or check if the start date is within 7-4 days from current date)')
           }
           else {
             alert("Successfully voted to create a game!")
