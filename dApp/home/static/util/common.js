@@ -1,5 +1,6 @@
-var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSE"];
+var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSED"];
 var gameStatusColor = ["#28a745", "#8A2BE2",	"#FFA500", "	#DB7093", "#B22222"];
+var accountAddr;
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -16,13 +17,11 @@ window.addEventListener('load', function() {
   init();
 });
 
-
-
 web3.eth.getAccounts(function(e,r){
   if (r.length > 0){
     document.getElementById('accountAddr').innerHTML += r[0];
-
-
+    accountAddr = r[0];
+    document.getElementById("to_accountpage").setAttribute("href", `/home/account/${accountAddr}`);
   }
   else
     document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
@@ -36,6 +35,18 @@ function getGameInfoTds(gid, league, A_B_DRAW, time, status) {
           <td><label class="label" style="background-color: ${gameStatusColor[status]}; color:white">${gameStatus[status]}</label></td>`;;
 }
 
+function getGameDateStr(timestamp){
+  let dt = parseTimestamp(timestamp);
+  let noon = "AM";
+
+  if (dt.hour > 12){
+    dt.hour -= 12;
+    noon = "PM";
+  }
+
+  return `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
+}
+
 function getGameInfo(games, gid){
   return new Promise(function(resolve, reject) {
     games[gid].getGameInfo(function(e,r) {
@@ -45,20 +56,12 @@ function getGameInfo(games, gid){
       let league = info[0];
       let A_B_DRAW = [info[1], info[2], 'DRAW'];
       let startTime = r[2].toNumber();
-
-      let dt = parseTimestamp(startTime);
-      let noon = "AM";
       let status;
 
-      if (dt.hour > 12){
-        dt.hour -= 12;
-        noon = "PM";
-      }
-
-      let time = `${dt.year}/${dt.month}/${dt.day} - ${noon} ${dt.hour}:${dt.minute}`;
+      let time = getGameDateStr(startTime);
 
       toto.isGameClosed(gid, function(e,r){
-        if (r) status = 3;
+        if (r) status = 4;
         else status = getStatus(startTime);
 
         resolve([league, A_B_DRAW, time, status, startTime]);

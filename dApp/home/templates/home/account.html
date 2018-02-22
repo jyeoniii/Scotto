@@ -72,6 +72,45 @@
             </tbody>
           </table>
         </div>
+
+        <div class = "col-md-12" style="margin-top:50px">
+          <table class="table">
+            <thead><h1 class="text-center" style="font-weight:bold">TRANSACTIONS</h1>
+              <tr>
+                <th>txid</th>
+                <th>Type</th>
+                <th>League</th>
+                <th>Game</th>
+              </tr>
+            </thead>
+            <tbody id="tx_info">
+              {% for tx in txs %}
+              <tr id="{{tx.txid}}">
+                <th><a target="_blank" href="https://testnet.etherscan.io/address/{{tx.txid}}">{{tx.txid}}</a></th>
+                <th>
+                  <label id="type_{{tx.txid}}">{{tx.txtype}}</label>
+                  <script>
+                    switch("{{tx.txtype}}"){
+                      case "CREATE":
+                        document.getElementById("type_{{tx.txid}}").style.backgroundColor = '#6A5ACD';
+                        break;
+                      case "BET":
+                        document.getElementById("type_{{tx.txid}}").style.backgroundColor = "#808000";
+                        break;
+                      case "VERIFY":
+                        document.getElementById("type_{{tx.txid}}").style.backgroundColor = "#800080";
+                        break;
+                    }
+                  </script>
+                </th>
+                <th>{{tx.league}}</th>
+                <th>{{tx.teamA}} : {{tx.teamB}}</th>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
 
@@ -93,7 +132,6 @@
   // Script related to web3
 
   var games;
-  var accountAddr;
   var toto;
   var balance;
   function init(){

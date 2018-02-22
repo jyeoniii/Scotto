@@ -1,9 +1,11 @@
+from .models import *
+from django.http import HttpResponse,JsonResponse, HttpResponseNotAllowed
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import League, Team, Post, Comment
 from django.forms.models import model_to_dict
-from django.http import HttpResponse,JsonResponse
 from .forms import PostForm
 from django.contrib import messages
+
 # Create your views here.
 
 def main(request):
@@ -15,8 +17,10 @@ def game(request, id):
   return render(request, 'home/game.html', {"gid":id})
 
 
-def account(request):
-    return render(request, 'home/account.html')
+def account(request, addr):
+  account = Account.objects.get_or_create(addr=addr)[0]
+  txs = Transaction.objects.filter(sender=account)
+  return render(request, 'home/account.html', {"txs":txs})
 
 def get_league_list():
   league_list = League.objects.all()
@@ -33,6 +37,72 @@ def all_json_models(request, league):
     teams_dict.append(model_to_dict(t))
 
   return JsonResponse(teams_dict, safe=False)
+
+@ensure_csrf_cookie
+def putCreateInfo(request):
+  if not request.is_ajax:
+    return HttpResponseNotAllowed()
+  try:
+    addr = request.POST.get('addr')
+    account = Account.objects.get_or_create(addr=addr)[0]
+  
+    txid = request.POST.get('txid')
+    league = request.POST.get('league')
+    teamA = request.POST.get('teamA')
+    teamB = request.POST.get('teamB')
+    startTime = request.POST.get('startTimeStamp')
+  except KeyError:
+    print("Faild to create txinfo")
+    return HttpResponse(status=304)
+
+  Transaction.objects.create(sender=account, txid=txid, txtype='CREATE',
+                             league=league, teamA=teamA, teamB=teamB, startTime=startTime)
+
+  return HttpResponse(status=200)
+
+@ensure_csrf_cookie
+def putBetInfo(request):
+  if not request.is_ajax:
+    return HttpResponseNotAllowed()
+  try:
+    addr = request.POST.get('addr')
+    account = Account.objects.get_or_create(addr=addr)[0]
+  
+    txid = request.POST.get('txid')
+    league = request.POST.get('league')
+    teamA = request.POST.get('teamA')
+    teamB = request.POST.get('teamB')
+    startTime = request.POST.get('startTimeStamp')
+  except KeyError:
+    print("Faild to create txinfo")
+    return HttpResponse(status=304)
+
+  Transaction.objects.create(sender=account, txid=txid, txtype='BET',
+                             league=league, teamA=teamA, teamB=teamB, startTime=startTime)
+
+  return HttpResponse(status=200)
+
+@ensure_csrf_cookie
+def putVerifyInfo(request):
+  if not request.is_ajax:
+    return HttpResponseNotAllowed()
+  try:
+    addr = request.POST.get('addr')
+    account = Account.objects.get_or_create(addr=addr)[0]
+
+    txid = request.POST.get('txid')
+    league = request.POST.get('league')
+    teamA = request.POST.get('teamA')
+    teamB = request.POST.get('teamB')
+    startTime = request.POST.get('startTimeStamp')
+  except KeyError:
+    print("Faild to create txinfo")
+    return HttpResponse(status=304)
+
+  Transaction.objects.create(sender=account, txid=txid, txtype='VERIFY',
+                             league=league, teamA=teamA, teamB=teamB, startTime=startTime)
+
+  return HttpResponse(status=200)
 
 
 def post_list(request):
@@ -78,6 +148,7 @@ def post_edit(request, id):
     else: #Get 요청일 때
         form = PostForm(instance = post)
     return render(request, 'home/post_posting.html', {'form' : form})
+
 def post_detail(request, id):
     """
     try:

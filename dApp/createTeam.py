@@ -1,6 +1,6 @@
 from home.models import League, Team
 
-f = open('teams', 'r')
+f = open('teams.txt', 'r')
 x = f.read()
 
 res = x.strip().split('\n\n')

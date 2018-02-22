@@ -155,7 +155,7 @@ contract Main is Scottoken{
 
     function isBettingTime(Game game) private view returns (bool){
         uint start = game.getStartTime();
-        return (now < start && now > start - BETTING_TIME);
+        return (now < start);
     }
 
     function isResultTime(Game game) private view returns (bool){

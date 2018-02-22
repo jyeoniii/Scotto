@@ -169,6 +169,27 @@
 {% endblock body_content %}
 
 {% block script_content %}
+  <script type="text/javascript" src='{% static "datetimepicker/jquery/jquery-1.8.3.min.js" %}' charset="UTF-8"></script>
+  <script type="text/javascript" src='{% static "util/jquery.cookie.js" %}'></script>
+  <script>
+  // Script related to ajax & csrf token
+
+  var csrftoken = $.cookie('csrftoken');
+
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+
+  </script>
 
   <script src="{% static 'FlipClock-master/compiled/flipclock.min.js' %}"></script>
 
@@ -176,7 +197,6 @@
 		var clock;
 
 		$(document).ready(function() {
-
 			clock = $('.clock').FlipClock({
 		        clockFace: 'DailyCounter',
 		        autoStart: false,
@@ -225,13 +245,17 @@
     });
   }
 
+  var league;
+  var A_B_DRAW;
+  var startTimeStamp;
+
   function showGameInfo(games, gid) {
     getGameInfo(games, gid).then(info => {
-      let league = info[0];
-      let A_B_DRAW = info[1];
+      league = info[0];
+      A_B_DRAW = info[1];
       let time = info[2];
       let status = info[3];
-      let startTime = info[4];
+      startTimeStamp = info[4];
 
       let teamA_elements = document.getElementsByName("teamA");
       let teamB_elements = document.getElementsByName("teamB");
@@ -248,7 +272,7 @@
       document.getElementById("time").innerHTML = time;
 
 
-      changeTemplateStatus(status, startTime);
+      changeTemplateStatus(status, startTimeStamp);
     })
   }
 
@@ -289,7 +313,7 @@
       clock.setTime(0);
     }
     else if (status == 4) { // Close
-      document.getElementById("closdDiv").style.display = "block";
+      document.getElementById("closeDiv").style.display = "block";
       clock.setTime(0);
     }
     else console.log(`Invalid status (${status})`);
@@ -321,9 +345,23 @@
     var etherAmount = document.getElementById('ether_amount').value;
     var tokenAmount = parseInt(document.getElementById('token_amount').value);
 
-    toto.betGame(gid, tokenAmount, result, {value:web3.toWei(etherAmount, 'ether')}, function(e,r){
-      if (e){ console.log(e); return; }
-    });
+    if (confirm(`Are you sure to bet to this game?\n( to ${A_B_DRAW[result]} - ${etherAmount} ETH, ${tokenAmount} SCT )`)){
+      toto.betGame(gid, tokenAmount, result, {value:web3.toWei(etherAmount, 'ether')}, function(e,txid){
+        if (e){ console.log(e); return; }
+        alert('Successfully betted to this game!');
+        $.ajax({
+           type: "POST",
+           url: "/home/putDB/bet",
+           data: {"txid":txid,
+                  "addr": accountAddr,
+                  "league":league,"teamA":A_B_DRAW[0], "teamB":A_B_DRAW[1],
+                  "startTimeStamp":startTimeStamp
+            },
+            dataType: 'json',
+           success: function() { console.log('Successfully put bet Info into DB')}
+        }); // end ajax
+      });
+    }
   }
 
   function enterResult() {
@@ -332,9 +370,24 @@
 
     var tokenAmount = parseInt(document.getElementById('result_token_amount').value);
 
-    toto.enterResult(gid, tokenAmount, result, function(e,r) {
-      if (e) { console.log(e); }
-    });
+    if (confirm(`Are you sure to verify this game?\n( to ${A_B_DRAW[result]} - ${tokenAmount} SCT )`)){
+      toto.enterResult(gid, tokenAmount, result, function(e,txid) {
+        if (e) { console.log(e); }
+        alert('Successfully verified this game!');
+        $.ajax({
+           type: "POST",
+           url: "/home/putDB/verify",
+           data: {"txid":txid,
+                  "addr": accountAddr,
+                  "league":league,"teamA":A_B_DRAW[0], "teamB":A_B_DRAW[1],
+                  "startTimeStamp":startTimeStamp
+            },
+            dataType: 'json',
+           success: function() { console.log('Successfully put bet Info into DB')}
+        }); // end ajax
+      });
+    }
+
   }
 
   function reward() {
