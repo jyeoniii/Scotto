@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ post.title }}
+{% endblock %}
+{% block body_content %}
+
+<div class="py-5">
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h3>{{ post.title }}</h3>
+      {{ post.content|linebreaks }}
+
+
+
+      <h3>Comments</h3>
+      <ul>
+          {% for comment in post.comment_set.all %}
+              <li>{{ comment.message }}
+                  <small>by {{ comment.author }}
+                      at {{ comment.updated_at }}</small>
+              </li>
+          {% endfor %}
+      </ul>
+      <hr/>
+      <a href="{% url "post_list" %}" class = "btn btn-primary">Main Page</a>
+    </div>
+  </div>
+
+</div>
+  </div>
+
+
+{% endblock body_content %}

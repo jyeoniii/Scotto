@@ -1,0 +1,43 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{%load bootstrap3 %}
+
+
+{% block head_content %}
+
+
+{% endblock head_content %}
+
+
+{% block body_content %}
+
+<div class="py-5">
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <p>
+
+
+              <form action="" method = "post" enctype = "multipart/form-data">
+          {% csrf_token %}
+          {% bootstrap_form form %}
+              <input type="submit" class = "btn btn-primary" value = "Submit"/>
+
+          </form>
+      </p>
+    </div>
+  </div>
+
+</div>
+  </div>
+
+
+
+
+    <script>
+    var dom = document.getElementById('{{ form.user_agent.id_for_label }}');
+    dom.value = navigator.userAgent;
+    </script>
+{% endblock body_content %}

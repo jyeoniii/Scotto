@@ -4,18 +4,21 @@
 {% block head_content %}
   <!-- Style for Datetime picker -->
   <link href='{% static "datetimepicker/css/bootstrap-datetimepicker.min.css"  %}' rel='stylesheet' type="text/css" media="screen">
+
+  <link href='{% static "home/css/common.css"  %}' rel='stylesheet' type="text/css" media="screen">
+
+
 {% endblock head_content %}
 
 {% block body_content %}
   {% csrf_token %}
 
   <!-- Header -->
-  <div class="py-5 text-center h-100" style="background-image: url(&quot;http://wallpaper-gallery.net/images/soccer-wallpapers/soccer-wallpapers-7.jpg&quot;);">
     <div class="container py-5">
       <div class="row">
         <div class="col-md-12" style="font-family: Helvetica Neue">
           <h1 class="display-3 mb-4 text-primary" style="font-weight:bold">Scotto</h1>
-          <h3 class="lead mb-5"> Predict the result of soccer games<br>based on Ethereum Smart Contract!</h3>
+          <h3 class="lead mb-5">Predict the result of soccer games<br>based on Ethereum Smart Contract!</h3>
         </div>
 
         <div class="col-xl-9 mx-auto">
@@ -138,7 +141,7 @@
             <br>CEO</p>
         </div>
         <div class="col-md-6 p-2">
-          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_carlito.jpg">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="{%static "home/img/jaeyeon.jpg"%}">
           <p class="my-4"><i>Jaeyeon Kim</i></p>
           <p><b>Princess</b>
             <br>Boss</p>
@@ -152,59 +155,58 @@
       <div class="row text-center">
         <div class="col-md-12">
           <h1 class="mb-4 text-primary">Benefits and features</h1>
-          <p class="lead">
-            <br>Modify colors, fonts and grid setting without opening any CSS file.</p>
+
           <div class="row text-left mt-5">
             <div class="col-md-4 my-3">
               <div class="row mb-3">
-                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-mars"></i></div>
+                <div class="text-center col-2"><i class=" d-block mx-auto fa fa-3x fal fa-users"></i></div>
                 <div class="align-self-center col-10">
-                  <h5 class="text-secondary"><b>For him</b></h5>
+                  <h5 class="text-secondary"><b>DECENTRALIZED</b></h5>
                 </div>
               </div>
-              <p>Based on fluid design principles. Works with screen resolution. &nbsp;In-app chat panel 24/7 active. The support you need, right there.</p>
+              <p>Based on Ethereum smart contract,  </p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
-                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-venus"></i></div>
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fas fa-level-down-alt"></i></div>
                 <div class="align-self-center col-10">
-                  <h5 class="text-secondary"><b>For her</b></h5>
+                  <h5 class="text-secondary"><b>LOW FEES</b></h5>
                 </div>
               </div>
               <p>Help us spreading the word. Tell your friends with just one-click.&nbsp;Work simultaneously on different panels with the switcher</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
-                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-neuter"></i></div>
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fas fa-shield-alt"></i></div>
                 <div class="align-self-center col-10">
-                  <h5 class="text-secondary"><b>For its</b></h5>
+                  <h5 class="text-secondary"><b>SAFE, AUTOMATED PAYMENTS</b></h5>
                 </div>
               </div>
               <p>You are working with plain HTML and SASS files on your computer, so extending and integrating Javascript is a breeze.</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
-                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-mars-stroke"></i></div>
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fas fa-universal-access"></i></div>
                 <div class="align-self-center col-10">
-                  <h5 class="text-secondary"><b>For anyone</b></h5>
+                  <h5 class="text-secondary"><b>FOR ANYONE</b></h5>
                 </div>
               </div>
               <p>Based on fluid design principles. Works with screen resolution.&nbsp;Choose settings depending on the criteria you value the most.</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
-                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-mars-double"></i></div>
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fal fa-search"></i></div>
                 <div class="align-self-center col-10">
-                  <h5 class="text-secondary"><b>Even couples</b></h5>
+                  <h5 class="text-secondary"><b>ACCURATE</b></h5>
                 </div>
               </div>
               <p>In-app chat panel 24/7 active. The support you need, right there. Pingendo enhance the battery duration and the quality of your life.&nbsp;</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
-                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fa-genderless"></i></div>
+                <div class="text-center col-2"><i class="d-block mx-auto fa fa-3x fas fa-balance-scale"></i></div>
                 <div class="align-self-center col-10">
-                  <h5 class="text-secondary"><b>Any other?</b></h5>
+                  <h5 class="text-secondary"><b>LAWFUL</b></h5>
                 </div>
               </div>
               <p>Help us spreading the word. Tell your friends with just one-click.&nbsp;Work simultaneously on different panels. Share the work with teammates.</p>
@@ -214,13 +216,13 @@
       </div>
     </div>
   </div>
-  <div class="py-5 text-white" style="background-image: url(&quot;https://pingendo.github.io/templates/sections/assets/test_lily.jpg&quot;);">
+  <div class="py-5 text-white text-left " style="background-image: url({%static "home/img/soccer.jpg"%});background-size:cover;">
     <div class="container">
       <div class="row">
         <div class="col-md-4">
-          <p class="lead"><i>"I have been using Pingendo since a while. There's no way I can leave it now or never. And many people are doing the same, and I seriously do not understand who isn't."</i>
+          <p class="lead"><i>"There are important counter-trends to this — encryption and cryptocurrency — that take power from centralized systems and put it back into people's hands"</i>
             <br> </p>
-          <p class="lead m-0"><b>Lily Jonhansen - Times</b></p>
+          <p class="lead m-0"><b>Mark Zuckerberg - Facebook</b></p>
         </div>
       </div>
     </div>
