@@ -10,11 +10,9 @@ var HOUR_IN_SECONDS = 3600;
 var MINUTE_IN_SECONDS = 60;
 var ORIGIN_YEAR = 1970;
 
-// var PLAYTING_TIME = 3 * HOUR_IN_SECONDS;
-// var RESULT_TIME = 18 * HOUR_IN_SECONDS;
+var PLAYING_TIME = 3 * HOUR_IN_SECONDS;
+var RESULT_TIME = 18 * HOUR_IN_SECONDS;
 
-var PLAYING_TIME = 60;
-var RESULT_TIME = 60;
 function isLeapYear(year) {
   if (year % 4 != 0) {
     return false;
@@ -53,9 +51,11 @@ function parseTimestamp(timestamp) {
   var buf;
   var i;
   var dt = {}; // datetime
-  //timestamp += 9 * HOUR_IN_SECONDS;
   // Year
   dt.year = getYear(timestamp);
+
+  timestamp += 9 * HOUR_IN_SECONDS;
+
   buf = leapYearsBefore(dt.year) - leapYearsBefore(ORIGIN_YEAR);
   secondsAccountedFor += LEAP_YEAR_IN_SECONDS * buf;
   secondsAccountedFor += YEAR_IN_SECONDS * (dt.year - ORIGIN_YEAR - buf);
@@ -92,7 +92,7 @@ function getYear(timestamp) {
   var secondsAccountedFor = 0;
   var year;
   var numLeapYears;
-  timestamp -= 9 * HOUR_IN_SECONDS;
+  timestamp += 9 * HOUR_IN_SECONDS;
   // Year
   year = parseInt(ORIGIN_YEAR + timestamp / YEAR_IN_SECONDS);
   numLeapYears = leapYearsBefore(year) - leapYearsBefore(ORIGIN_YEAR);
@@ -116,19 +116,15 @@ function getDay(timestamp) {
   return parseTimestamp(timestamp).day;
 }
 function getHour(timestamp) {
-  timestamp -= 9 * HOUR_IN_SECONDS;
   return parseInt(timestamp / 60 / 60) % 24;
 }
 function getMinute(timestamp) {
-  timestamp -= 9 * HOUR_IN_SECONDS;
   return parseInt(timestamp / 60) % 60;
 }
 function getSecond(timestamp) {
-  timestamp -= 9 * HOUR_IN_SECONDS;
   return timestamp % 60;
 }
 function getWeekday(timestamp) {
-  timestamp -= 9 * HOUR_IN_SECONDS;
   return parseInt(timestamp / DAY_IN_SECONDS + 4) % 7;
 }
 
