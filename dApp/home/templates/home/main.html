@@ -11,7 +11,20 @@
 {% endblock head_content %}
 
 {% block body_content %}
-
+<!--Start of Tawk.to Script-->
+<script src = "lib/SendBird.min.js"></script>
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/5a8d5b4d4b401e45400d182c/default';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
   <!-- Header -->
     <div class="container py-5">
       <div class="row">
@@ -348,9 +361,10 @@
                   ${league} - ${teamA} vs ${teamB}
                   ${game_date.getFullYear()}/${game_date.getMonth()+1}/${game_date.getDate()} ${game_date.getHours()}:${game_date.getMinutes()}`) &&
           toto != undefined) {
+            console.log(timestamp);
         toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,r){
           if(e) console.log(e);
-          else alert("Successfully voted to create a game!")
+          else { alert("Successfully voted to create a game!"); console.log(r); }
         });
       }
     }
