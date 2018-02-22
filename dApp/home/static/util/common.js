@@ -13,6 +13,7 @@ window.addEventListener('load', function() {
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
   // Now you can start your app & access web3 freely:
+  base();
   init();
 });
 

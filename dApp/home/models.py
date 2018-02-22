@@ -1,9 +1,11 @@
+from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 import re
 from django.forms import ValidationError
 from django.urls import reverse
 from django import forms
+
 
 # Create your models here.
 def lnglat_validator(value):

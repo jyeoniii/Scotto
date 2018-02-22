@@ -7,16 +7,18 @@
   <title>Scotto</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
   <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
   <link rel="stylesheet" href="https://v40.pingendo.com/assets/4.0.0/default/theme.css" type="text/css"> </head>
 
-<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+
 
 
 
   <link href='{% static "home/css/common.css"  %}' rel='stylesheet' type="text/css" media="screen">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 
 
   {% block head_content %}
@@ -50,12 +52,13 @@
 
 
         </ul>
-        <a class="btn navbar-btn ml-2 text-white " id="accountAddr"><i class="fa d-inline fa-lg fas fa-user-secret"></i></a>
-        <button class="btn navbar-btn ml-2 text-black" onclick="faucet()" ><i class="fa d-inline fa-lg fas fal fab fa-bitcoin"></i> Get Free tokens!
+        <a class="btn navbar-btn ml-2 text-white " id="accountAddr"><i class="fa d-inline fa-lg fas fa-user-secret"></i> </a>
+        <i class="fa d-inline fa-lg  fab fa-bitcoin"></i><span class="btn navbar-btn text-white" id = "balance" style = "padding-left : 3px; padding-right : 3px; margin-left : 3px;"></span><span>SCT</span>
+        <button class="btn navbar-btn ml-2 text-black" onclick="faucet()" > Get Free tokens!</button>
       </div>
     </div>
   </nav>
-  <div class="py-5 text-center h-100" style="background-image: url('http://wallpaper-gallery.net/images/soccer-wallpapers/soccer-wallpapers-7.jpg'); background-size:cover;">
+  <div class="py-5 text-center h-100" style="background-image: url('{%static "home/img/background.jpg"%}'); background-size:cover;">
 
   {% block body_content %}
   {% endblock body_content %}
@@ -73,25 +76,44 @@
 <script type="text/javascript" src='{% static "util/common.js" %}'></script>
 <script type="text/javascript" src='{% static "util/timestamp.js" %}'></script>
 
-
-
-{% block script_content %}
 <script>
 // Script related to web3
 
-var games;
-var gameStatus = ["BETTING", "PLAYING", "RESULT", "REWARD", "CLOSE"];
-var gameStatusColor = ["#28a745", "#8A2BE2",	"#FFA500", "	#DB7093", "#B22222"];
-function init(){
+function base(){
+
   Toto = web3.eth.contract(mainAbi);
   Game = web3.eth.contract(gameAbi);
 
-  console.log(contractAddress);
 
-  Toto.at(contractAddress, function(e, instance));//end Toto.at
+  Toto.at(contractAddress, function(e, instance){
+    toto = instance;
+    web3.eth.getAccounts(function(e,r){
+      if (r.length > 0){
+
+        toto.balanceOf(r[0], function(e,r){
+          if(r)
+          document.getElementById('balance').innerHTML = r;
+
+        })
+
+      }
+      else
+        document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
+    });
+
+  });//end Toto.at
 };//endinit
 
+function faucet(){
+  toto.faucet(function(e,r){
+    if(r)console.log(r);
+  })
+}
+
 </script>
+
+{% block script_content %}
+
 {% endblock script_content %}
 
 {% block style_content %}
