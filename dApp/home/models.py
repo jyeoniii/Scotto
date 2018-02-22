@@ -1,9 +1,14 @@
+from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 import re
 from django.forms import ValidationError
 from django.urls import reverse
 from django import forms
+from django.db import models
+from django.utils import timezone
+
+
 # Create your models here.
 def lnglat_validator(value):
     if not re.match(r'^(\d+\.?\d*),(\d+\.?\d*)$', value) :
