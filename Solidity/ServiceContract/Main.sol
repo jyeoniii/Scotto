@@ -28,17 +28,12 @@ contract Main is Scottoken{
 
 
     //constant
-    uint private constant MIN_CREATORS = 1;
-    // uint private constant CREATE_START = 7 days;
-    // uint private constant CREATE_PERIOD = 4 days;
-    // uint private constant BETTING_TIME = 3 days;
-    // uint private constant PLAYING_TIME = 3 hours;
-    // uint private constant RESULT_TIME = 18 hours;
-     uint private constant CREATE_START = 180;
-    uint private constant CREATE_PERIOD = 120;
-    uint private constant BETTING_TIME =60;
-    uint private constant PLAYING_TIME =60;
-    uint private constant RESULT_TIME = 60;
+    uint private constant MIN_CREATORS = 20;
+    uint private constant CREATE_START = 7 days;
+    uint private constant CREATE_PERIOD = 4 days;
+    uint private constant PLAYING_TIME = 3 hours;
+    uint private constant RESULT_TIME = 18 hours;
+
 
     uint private id = 0;
     Game[] private games;
@@ -56,7 +51,7 @@ contract Main is Scottoken{
 
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
-        require(isCreatingTime(timestamp) == true);
+        require(isCreatingTime(timestamp));
         require(tokenAmount >= this.getCirculate() * 25 / 1000); // Not Implemented yet
 
         tempGame storage tmpGame = tempGames[gameInfoStr];
@@ -101,9 +96,10 @@ contract Main is Scottoken{
     function betGame(uint _id, uint tokenAmount, uint8 result) public logging(_id) payable {
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender) && msg.value > 0);
         require(result>= 0 && result <= 2);
-        require(isBettingTime(game));
 
         Game game = games[_id];
+        require(isBettingTime(game));
+
         game.addBettingInfo(msg.sender, msg.value, tokenAmount, result);
         game.transfer(msg.value);
 
@@ -121,8 +117,8 @@ contract Main is Scottoken{
 
 
     function enterResult(uint _id, uint tokenAmount, uint8 result) logging(_id) public {
-         require(isResultTime(game));
         Game game = games[_id];
+        require(isResultTime(game));
         game.enterResult(msg.sender, tokenAmount, result);
 
        __balanceOf[msg.sender] -= tokenAmount;
@@ -137,10 +133,10 @@ contract Main is Scottoken{
 
 
     function checkResult(uint _id) logging(_id) public { // when user triggers event after the result has been decided
-        require(isRewardingTime(game));
         require(!isGameClosed(_id));
 
         Game game = games[_id];
+        require(isRewardingTime(game));
         game.finalize();
 
         if(game.balance > 0 )
