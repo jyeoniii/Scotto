@@ -348,7 +348,7 @@
     if (confirm(`Are you sure to bet to this game?\n( to ${A_B_DRAW[result]} - ${etherAmount} ETH, ${tokenAmount} SCT )`)){
       toto.betGame(gid, tokenAmount, result, {value:web3.toWei(etherAmount, 'ether')}, function(e,txid){
         if (e){ console.log(e); return; }
-        alert('Successfully betted to this game!');
+        alert('Successfully bet to this game!');
         $.ajax({
            type: "POST",
            url: "/home/putDB/bet",

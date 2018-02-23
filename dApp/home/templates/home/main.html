@@ -278,7 +278,8 @@ At night a candle's brighter than the sun</p>
         }//end for
       });//end getGames
       instance.getCirculate(function(e,circSCT) {
-        let minSCT = circSCT * 0.025;
+        console.log(circSCT);
+        let minSCT = circSCT * 0.0005;
         document.getElementById("minSCT").value = minSCT;
         document.getElementById("create_token_amount").placeholder += ` (min: ${minSCT})`;
       });
