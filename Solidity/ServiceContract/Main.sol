@@ -52,7 +52,7 @@ contract Main is Scottoken{
     function createGame(string gameInfoStr, uint timestamp, uint tokenAmount) public returns (Game[]){
         require(tokenAmount > 0 && tokenAmount <= balanceOf(msg.sender));
         require(isCreatingTime(timestamp));
-        require(tokenAmount >= this.getCirculate() * 25 / 1000); // Not Implemented yet
+        require(tokenAmount >= this.getCirculate() * 5 / 10000); // Not Implemented yet
 
         tempGame storage tmpGame = tempGames[gameInfoStr];
         require(tmpGame.creatorArray.length < MIN_CREATORS);
@@ -70,7 +70,8 @@ contract Main is Scottoken{
 
         // Create game if condition is met
 
-        if (tmpGame.creatorArray.length >= MIN_CREATORS ) {
+        if (tmpGame.creatorArray.length >= MIN_CREATORS &&
+            tmpGame.totalToken >= this.getCirculate() * 25 / 1000) {
             Game game = new Game(id, gameInfoStr, tmpGame.creatorArray,tmpGame.tokenArray, tmpGame.totalToken, timestamp);
             games.push(game);
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
