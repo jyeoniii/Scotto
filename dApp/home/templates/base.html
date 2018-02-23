@@ -12,14 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
   <link rel="stylesheet" href="https://v40.pingendo.com/assets/4.0.0/default/theme.css" type="text/css"> </head>
-
-
-
-
-
   <link href='{% static "home/css/common.css"  %}' rel='stylesheet' type="text/css" media="screen">
-
-
 
   {% block head_content %}
 
@@ -76,40 +69,6 @@
 <script type="text/javascript" src='{% static "util/common.js" %}'></script>
 <script type="text/javascript" src='{% static "util/timestamp.js" %}'></script>
 
-<script>
-// Script related to web3
-
-function base(){
-
-  Toto = web3.eth.contract(mainAbi);
-  Game = web3.eth.contract(gameAbi);
-
-
-  Toto.at(contractAddress, function(e, instance){
-    toto = instance;
-    web3.eth.getAccounts(function(e,r){
-      if (r.length > 0){
-
-        toto.balanceOf(r[0], function(e,r){
-          if(r)
-          document.getElementById('balance').innerHTML = r;
-
-        })
-
-      }
-      
-    });
-
-  });//end Toto.at
-};//endinit
-
-function faucet(){
-  toto.faucet(function(e,r){
-    if(r)console.log(r);
-  })
-}
-
-</script>
 
 {% block script_content %}
 

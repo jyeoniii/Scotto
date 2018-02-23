@@ -69,3 +69,32 @@ function getGameInfo(games, gid){
     }); //end getGameInfo
   }); //end Promise
 }
+
+// Script related to web3
+
+function base(){
+
+  Toto = web3.eth.contract(mainAbi);
+  Game = web3.eth.contract(gameAbi);
+
+
+  Toto.at(contractAddress, function(e, instance){
+    toto = instance;
+    web3.eth.getAccounts(function(e,r){
+      if (r.length > 0){
+        toto.balanceOf(r[0], function(e,r){
+          if(r) document.getElementById('balance').innerHTML = r;
+        })
+
+      }
+      else
+        document.getElementById('accountAddr').innerHTML += "Please sign in to Metamask first!";
+    });
+  });//end Toto.at
+};//endinit
+
+function faucet(){
+  toto.faucet(function(e,r){
+    if(r)console.log(r);
+  })
+}
