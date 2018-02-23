@@ -128,22 +128,23 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1>Developers</h1>
+          <h1>The SCOTTO Team</h1>
           <p class="lead">We grow together with the community</p>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 p-2">
-          <img class="img-fluid d-block rounded-circle mx-auto" src="https://pingendo.github.io/templates/sections/assets/test_meow.jpg">
-          <p class="my-4"><i>Hyunyoung Jung</i></p>
-          <p><b>Sacrificer & Mental Contributer</b>
-            <br>CEO</p>
-        </div>
+
         <div class="col-md-6 p-2">
           <img class="img-fluid d-block rounded-circle mx-auto" src="{%static "home/img/jaeyeon.jpg"%}">
           <p class="my-4"><i>Jaeyeon Kim</i></p>
-          <p><b>Princess</b>
-            <br>Boss</p>
+          <p><b>Co-founder & Developer</b>
+
+        </div>
+        <div class="col-md-6 p-2">
+          <img class="img-fluid d-block rounded-circle mx-auto" src="{%static "home/img/hy.jpg"%}">
+          <p class="my-4"><i>Hyunyoung Jung</i></p>
+          <p><b>Co-founder & Developer</b>
+
         </div>
       </div>
     </div>
@@ -163,7 +164,10 @@
                   <h5 class="text-secondary"><b>DECENTRALIZED</b></h5>
                 </div>
               </div>
-              <p>Based on Ethereum smart contract,  </p>
+              <p>I don't take coffee, I take tea, my dear
+I like my toast done on one side
+And you can hear it in my accent when I talk
+I'm an Englishman in New York </p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
@@ -172,7 +176,10 @@
                   <h5 class="text-secondary"><b>LOW FEES</b></h5>
                 </div>
               </div>
-              <p>Help us spreading the word. Tell your friends with just one-click.&nbsp;Work simultaneously on different panels with the switcher</p>
+              <p>See me walking down Fifth Avenue
+A walking cane here at my side
+I take it everywhere I walk
+I'm an Englishman in New York</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
@@ -181,7 +188,10 @@
                   <h5 class="text-secondary"><b>SAFE, AUTOMATED PAYMENTS</b></h5>
                 </div>
               </div>
-              <p>You are working with plain HTML and SASS files on your computer, so extending and integrating Javascript is a breeze.</p>
+              <p>Oh, I'm an alien, I'm a legal alien
+I'm an Englishman in New York
+Oh, I'm an alien, I'm a legal alien
+I'm an Englishman in New York</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
@@ -190,7 +200,10 @@
                   <h5 class="text-secondary"><b>FOR ANYONE</b></h5>
                 </div>
               </div>
-              <p>Based on fluid design principles. Works with screen resolution.&nbsp;Choose settings depending on the criteria you value the most.</p>
+              <p>If "manners maketh man" as someone said
+He's the hero of the day
+It takes a man to suffer ignorance and smile
+Be yourself no matter what they say</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
@@ -199,7 +212,10 @@
                   <h5 class="text-secondary"><b>ACCURATE</b></h5>
                 </div>
               </div>
-              <p>In-app chat panel 24/7 active. The support you need, right there. Pingendo enhance the battery duration and the quality of your life.&nbsp;</p>
+              <p>Oh, I'm an alien, I'm a legal alien
+I'm an Englishman in New York
+Oh, I'm an alien, I'm a legal alien
+I'm an Englishman in New York</p>
             </div>
             <div class="col-md-4 my-3">
               <div class="row mb-3">
@@ -208,7 +224,10 @@
                   <h5 class="text-secondary"><b>LAWFUL</b></h5>
                 </div>
               </div>
-              <p>Help us spreading the word. Tell your friends with just one-click.&nbsp;Work simultaneously on different panels. Share the work with teammates.</p>
+              <p>Modesty, propriety can lead to notoriety
+You could end up as the only one
+Gentleness, sobriety are rare in this society
+At night a candle's brighter than the sun</p>
             </div>
           </div>
         </div>
@@ -308,8 +327,8 @@
       console.log(maxDate);
 
       $('.form_datetime').datetimepicker({
-        startDate: minDate,
-        endDate: maxDate,
+        // startDate: minDate,
+        // endDate: maxDate,
         weekStart: 1,
         todayBtn:  1,
       	autoclose: 1,
@@ -408,6 +427,7 @@
       if (confirm(`Are you sure you want to create this game?\n
                   ${league} - ${teamA} vs ${teamB}
                   ${startDateStr}, ${tokenAmount} SCT`) && toto != undefined) {
+                    console.log(timestamp);
         toto.createGame(gameInfoStr, timestamp, tokenAmount, function(e,txid){
           if(e) {
             console.log(e);

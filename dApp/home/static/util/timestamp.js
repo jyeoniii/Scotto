@@ -13,7 +13,7 @@ var ORIGIN_YEAR = 1970;
 // var PLAYTING_TIME = 3 * HOUR_IN_SECONDS;
 // var RESULT_TIME = 18 * HOUR_IN_SECONDS;
 
-var PLAYTING_TIME = 60;
+var PLAYING_TIME = 60;
 var RESULT_TIME = 60;
 function isLeapYear(year) {
   if (year % 4 != 0) {
@@ -158,7 +158,7 @@ function toTimestamp(year, month, day, hour, minute, second) {
   // Second
   timestamp += second;
 
-  return timestamp ;
+  return timestamp - 9 * HOUR_IN_SECONDS;
 }
 
 function getStatus(startTime){
