@@ -1,4 +1,4 @@
-var contractAddress = "0x98e33b8281d8959399ec58eaa7a81649870697f6";
+var contractAddress = "0xe274c064f4dcc9fa3550a20f12f157fe61d67382";//KOVAN TEST NETWORK CONTRACT ADDRESS
 var mainAbi =[
 	{
 		"constant": true,

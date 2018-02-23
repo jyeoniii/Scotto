@@ -294,7 +294,7 @@
       let date = new Date();
       let now = toTimestamp(date.getFullYear(), date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
 
-      clock.setTime(startTime + PLAYTING_TIME - now)
+      clock.setTime(startTime + PLAYING_TIME - now)
       clock.setCountdown(true);
       clock.start();
     }
@@ -304,7 +304,7 @@
       let date = new Date();
       let now = toTimestamp(date.getFullYear(), date.getMonth()+1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
 
-      clock.setTime(startTime + PLAYTING_TIME + RESULT_TIME - now);
+      clock.setTime(startTime + PLAYING_TIME + RESULT_TIME - now);
       clock.setCountdown(true);
       clock.start();
     }
