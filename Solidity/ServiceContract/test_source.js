@@ -11,7 +11,6 @@ fs = require('fs');
 input = {
   'Main.sol' : fs.readFileSync('Main.sol', 'utf8'),
   'Game.sol' : fs.readFileSync('Game.sol', 'utf8'),
-  'Creator.sol' : fs.readFileSync('Creator.sol', 'utf8'),
   'Token.sol' : fs.readFileSync('Token.sol', 'utf8')
 }
 compiledContract = solc.compile({sources: input}, 1)
