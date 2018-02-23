@@ -3,7 +3,7 @@ import "./Game.sol";
 
 import "./Token.sol";
 
-contract Main is Scottoken{
+contract Scotto_beta is Scottoken{
 
     event MainBalanceLog(uint etherAmount, uint tokenAmount);
     event GameBalanceLog(uint id, uint etherAmount, uint tokenAmount);
@@ -37,7 +37,7 @@ contract Main is Scottoken{
 
     uint private id = 0;
     Game[] private games;
-    address _owner;
+
     mapping (string => tempGame) private tempGames; // string: identifier of the game
 
     mapping (address => uint[] ) private creatorInfo;
@@ -71,7 +71,7 @@ contract Main is Scottoken{
         // Create game if condition is met
 
         if (tmpGame.creatorArray.length >= MIN_CREATORS &&
-            tmpGame.totalToken >= this.getCirculate() * 25 / 1000) {
+            tmpGame.totalToken >= this.getCirculate() * 25/1000) {
             Game game = new Game(id, gameInfoStr, tmpGame.creatorArray,tmpGame.tokenArray, tmpGame.totalToken, timestamp);
             games.push(game);
             this.approve(game, tmpGame.totalToken); // approve game instance to transfer token in Main Contract
