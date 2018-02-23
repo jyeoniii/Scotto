@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head_content %}
+{% endblock head_content %}
+
+{% block body_content %}
+
+
+    <div class="container py-5">
+
+
+
+  <!-- Table -->
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+
+
+
+        <div class="col-md-12">
+          <table class="table">
+            <thead><h1 class="text-center" style="font-weight:bold">CREATE INFO</h1>
+              <tr>
+                <th>id</th>
+                <th>League</th>
+                <th>Game</th>
+                <th>Start Time</th>
+                <th>Status</th>
+                <th>SCT Amount</th>
+              </tr>
+            </thead>
+            <tbody id="create_info">
+            </tbody>
+          </table>
+        </div>
+
+
+        <div class = "col-md-12" style="margin-top:50px">
+          <table class="table">
+            <thead><h1 class="text-center" style="font-weight:bold">BET INFO</h1>
+              <tr>
+                <th>id</th>
+                <th>League</th>
+                <th>Game</th>
+                <th>Start Time</th>
+                <th>Status</th>
+                <th>Result</th>
+                <th>ETH Amount</th>
+                <th>SCT Amount</th>
+              </tr>
+            </thead>
+            <tbody id="betting_info">
+            </tbody>
+          </table>
+        </div>
+
+        <div class = "col-md-12" style="margin-top:50px">
+          <table class="table">
+            <thead><h1 class="text-center" style="font-weight:bold">VERIFY INFO</h1>
+              <tr>
+                <th>id</th>
+                <th>League</th>
+                <th>Game</th>
+                <th>Start Time</th>
+                <th>Status</th>
+                <th>Result</th>
+                <th>SCT Amount</th>
+              </tr>
+            </thead>
+            <tbody id="verifying_info">
+            </tbody>
+          </table>
+        </div>
+
+        <div class = "col-md-12" style="margin-top:50px">
+          <table class="table">
+            <thead><h1 class="text-center" style="font-weight:bold">TRANSACTIONS</h1>
+              <tr>
+                <th>txid</th>
+                <th>Type</th>
+                <th>League</th>
+                <th>Game</th>
+              </tr>
+            </thead>
+            <tbody id="tx_info">
+              {% for tx in txs %}
+              <tr id="{{tx.txid}}">
+                <th><a target="_blank" href="https://testnet.etherscan.io/address/{{tx.txid}}">{{tx.txid}}</a></th>
+                <th>
+                  <label id="type_{{tx.txid}}">{{tx.txtype}}</label>
+
+                </th>
+                <th>{{tx.league}}</th>
+                <th>{{tx.teamA}} : {{tx.teamB}}</th>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+
+
+    </div>
+  </div>
+</div>
+
+{% endblock body_content %}
+
+{% block script_content %}
+
+
+{% endblock script_content %}

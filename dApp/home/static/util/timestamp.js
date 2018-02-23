@@ -13,6 +13,7 @@ var ORIGIN_YEAR = 1970;
 var PLAYING_TIME = 3 * HOUR_IN_SECONDS;
 var RESULT_TIME = 18 * HOUR_IN_SECONDS;
 
+
 function isLeapYear(year) {
   if (year % 4 != 0) {
     return false;

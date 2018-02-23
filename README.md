@@ -131,7 +131,7 @@ Ex) 패자가 배팅한 이더 총액에서 수수료 10%를 제외한 이더리
     - 치명적인 사용성. ex) 경기결과가 나오고도 합의 과정을 거쳐 완료되어야만 배당금을 받을 수 있다. 하지만 기존의 시스템의 경우는 축구 휫슬이 울리자마자 계좌에 당첨금이 들어옴.
 
 ### System Architecture
-![System Architecture](https://github.com/jyeoniii/toto/tree/master/image/system_architecture.png)
+![System Architecture](./image/system_architecture.png)
 
 ### Compensation Structure
-![Compensation Structure](https://github.com/jyeoniii/toto/tree/master/image/compensation_structure.png)
+![Compensation Structure](./image/compensation_structure.png)
