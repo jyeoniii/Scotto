@@ -259,7 +259,7 @@
         }//end for
       });//end getGames
       instance.getCirculate(function(e,circSCT) {
-        let minSCT = circSCT * 0.025;
+        let minSCT = circSCT * 0.005;
         document.getElementById("minSCT").value = minSCT;
         document.getElementById("create_token_amount").placeholder += ` (min: ${minSCT})`;
       });
